@@ -31,16 +31,17 @@ const LoginBoxed = () => {
         password: Yup.string().required(t('enter_password')),
     });
 
-    const toLogin = async (formValue: LoginData) => {
-        const rst: any = await loginapi(formValue)
-        dispatch(rdxlogin({
-            logined: "1",
-            username: formValue.username,
-            userimg: rst.img,
-            nickname: rst.nickName,
-            jwt: rst.token,
-        }))
-        navigate('/')
+    const toLogin = (formValue: LoginData) => {
+        loginapi(formValue, (rst : any) =>{
+            dispatch(rdxlogin({
+                logined: "1",
+                username: formValue.username,
+                userimg: rst.img,
+                nickname: rst.nickName,
+                jwt: rst.token,
+            }))
+            navigate('/')
+        })
     }
 
     return (

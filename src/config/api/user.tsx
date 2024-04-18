@@ -5,7 +5,7 @@ export type LoginData = {
     password: string,
     reme: boolean
 }
-export const loginapi = (data: LoginData) => request({url:'/api/auth/login', method: 'post', data})
+export const loginapi = (data: LoginData, logined: Function) => request({url:'/api/auth/login', method: 'post', data, fun: logined})
 
 export type RegisterData = {
     nickname: string,
@@ -14,4 +14,4 @@ export type RegisterData = {
 }
 export const registerapi = (data: RegisterData) => request({url:'/api/auth/register', method: 'post', data})
 
-export const logoutapi = () => request({url:'/api/auth/logout', method:'post'})
+export const logoutapi = (logouted: Function) => request({url:'/api/auth/logout', method:'post', fun: logouted})

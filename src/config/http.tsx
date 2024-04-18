@@ -20,7 +20,7 @@ http.interceptors.request.use(config => {
 // 响应拦截
 http.interceptors.response.use(
     response => {
-        return response.data.data
+        return response.data
     }, 
     err => {
         let response = err.response;
@@ -70,10 +70,13 @@ type ReCfg = {
     method?: 'get' | 'post' | 'put' | 'delete';
     params?: any;
     data?: any;
+    fun?: Function;
 }
 
-function request({ method = 'get', url, data = {}, params = {} }: ReCfg) {
-    return http({method, url, data, params})
+async function request({ method = 'get', url, data = {}, params = {}, fun }: ReCfg) {
+    const rdata = await http({method, url, data, params})
+    if(!rdata) return
+    if(fun) fun(rdata.data)
 }
 
 export default request

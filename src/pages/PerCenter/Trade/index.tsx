@@ -24,12 +24,13 @@ const Trade = () => {
         reqTradeNotice()
     }, []);
 
-    async function reqTradeNotice(){
+    function reqTradeNotice(){
         setFetching(true)
-        const data: any = await getTrades({}, page, pageSize)
-        setTotalRecord(data.total)
-        setRecordsData(data.data)
-        setFetching(false)
+        getTrades({}, page, pageSize, (data: any) => {
+            setTotalRecord(data.total)
+            setRecordsData(data.data)
+            setFetching(false)
+        })
     }
 
     const changePage = (page: number) => {

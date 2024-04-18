@@ -47,10 +47,11 @@ const Header = () => {
     const authStore = useSelector((state: IRootState) => state.authStore);
     const dispatch = useDispatch();
     
-    const logout = async() => {
-        await logoutapi()
-        dispatch(rdxlogout())
-        navigate('/auth/login')
+    const logout = () => {
+        logoutapi(() => {
+            dispatch(rdxlogout())
+            navigate('/auth/login')
+        })
     }
 
     function createMarkup(messages: any) {

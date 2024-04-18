@@ -29,9 +29,8 @@ const Index = () => {
         loadGuessLikes()
     }, [])
 
-    const loadGuessLikes = async () => {
-        const rst: any = await guessLikesapi()
-        setGuessLikes(rst)
+    const loadGuessLikes = () => {
+        guessLikesapi(setGuessLikes)
     }
 
     return (
