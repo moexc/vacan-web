@@ -1,0 +1,24 @@
+{
+    "sign_up": "注册",
+    "sign_in": "登录",
+    "sign_out": "退出",
+    "nickname": "户名",
+    "username": "账号",
+    "password": "密码",
+    "remember_me": "记住我（一周）",
+    "enter_nickname": "输入户名",
+    "enter_username": "输入账号",
+    "enter_password": "输入密码",
+    "enter_username_pwd2register": "输入账号及密码进行注册",
+    "enter_username_pwd2login": "输入账号及密码进行登录验证",
+    "dt_have_account": "没有账号？",
+    "have_account": "已有账号？",
+    "personal_center": "个人中心",
+    "search": "搜索",
+    "today_star": "今日推荐",
+
+    "page_index": "首页",
+    "page_group_apps": "功能",
+    "page_trade": "专场设置"
+
+}

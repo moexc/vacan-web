@@ -1,0 +1,24 @@
+{
+    "sign_up": "Sign up",
+    "sign_in": "Sign In",
+    "sign_out": "Sign Out",
+    "nickname": "NickName",
+    "username": "UserName",
+    "password": "Password",
+    "remember_me": "Subscribe to weekly newsletter",
+    "enter_nickname": "Enter Nickname",
+    "enter_username": "Enter Username",
+    "enter_password": "Enter Password",
+    "enter_username_pwd2register": "Enter your email and password to register",
+    "enter_username_pwd2login": "Enter your username and password to login",
+    "dt_have_account": "Don't have an account ?",
+    "have_account": "Already have an account ?",
+    "personal_center": "Personal Center",
+    "search": "Search",
+    "today_star": "Today's Star",
+
+    "page_index": "Index",
+    "page_group_apps": "apps",
+    "page_trade": "Trade"
+    
+}
