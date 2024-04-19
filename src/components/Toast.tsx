@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+import Swal, { SweetAlertOptions } from "sweetalert2";
 export const toast = (text: string, color: 'primary'| 'success' | 'info' | 'warning' | 'danger' = 'primary') => {
     const toast = Swal.mixin({
         toast: true,
@@ -12,5 +12,21 @@ export const toast = (text: string, color: 'primary'| 'success' | 'info' | 'warn
     });
     toast.fire({
         title: text,
+    });
+}
+
+export const confirm = (options: SweetAlertOptions, confirmed: Function, canceled?: Function) => {
+    Swal.fire({
+        ...options,
+        confirmButtonText: options.confirmButtonText || '确认',
+        showCancelButton: options.showCancelButton || true,
+        cancelButtonText: options.cancelButtonText || '取消',
+        padding: '2em',
+        customClass: 'sweet-alerts',
+    }).then((result) => {
+        if (result.value) confirmed()
+        else{
+            if (canceled) canceled()
+        } 
     });
 }

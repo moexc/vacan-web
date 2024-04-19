@@ -1,37 +1,39 @@
-import { Link } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { setPageTitle } from '../store/themeConfigStore';
 import { useDispatch } from 'react-redux';
-import IconDesktop from '../components/Icon/IconDesktop';
-import IconUser from '../components/Icon/IconUser';
 import IconBox from '../components/Icon/IconBox';
-import IconDollarSignCircle from '../components/Icon/IconDollarSignCircle';
-import IconRouter from '../components/Icon/IconRouter';
 import BlankHeader from '../components/Layouts/BlankHeader'
 import { useTranslation } from 'react-i18next';
-import { guessLikesapi } from '../config/api/shop';
+import IconStar from '../components/Icon/IconStar';
+import IconClipboardText from '../components/Icon/IconClipboardText';
+import IconTrendingUp from '../components/Icon/IconTrendingUp';
+import IconTwitter from '../components/Icon/IconTwitter';
 
 const Index = () => {
     const {t} = useTranslation()
     const dispatch = useDispatch();
+    const navigator = useNavigate()
     useEffect(() => {
         dispatch(setPageTitle('首页'));
     });
-    const [activeTab, setActiveTab] = useState<String>('general');
+    const [activeTab, setActiveTabString] = useState<String>('nohas');
+    const setActiveTab = (path: string) => {
+        setActiveTabString(path)
+        navigator('/'+ path)
+    }
     const hotsearchs=[
         'Sales', 'Charts', 'Finance', 'Trending', 'Order', 'Item', 'Model', 'Field', 'Form'
     ]
 
     const [hotsearch, setHotsearch] = useState('')
-    const [guessLikes, setGuessLikes] = useState([])
     useEffect(()=>{
         setHotsearch('夏季男装')
-        loadGuessLikes()
     }, [])
 
-    const loadGuessLikes = () => {
-        guessLikesapi(setGuessLikes)
-    }
+    useEffect(() => {
+        setActiveTabString(window.location.pathname.replaceAll("/", ""))
+    }, []);
 
     return (
         <div>
@@ -62,81 +64,53 @@ const Index = () => {
             <div className="mb-12 flex items-center rounded-b-md bg-[#DBE7FF] dark:bg-[#141F31]">
                 <ul className="mx-auto flex items-center gap-5 overflow-auto whitespace-nowrap px-3 py-4.5 xl:gap-8">
                     <li
-                        className={`group flex min-w-[120px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
-                    ${activeTab === 'general' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
-                        onClick={() => setActiveTab('general')}
+                        className={`group flex w-[150px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
+                    ${activeTab === '' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
+                        onClick={() => setActiveTab('')}
                     >
-                        <IconDesktop fill={true} />
-
-                        <h5 className="font-bold text-black dark:text-white">General</h5>
+                        <IconStar fill={true} className="w-8 h-8"/>
+                        <h5 className="font-bold text-black dark:text-white">{t('suggest')}</h5>
                     </li>
                     <li
-                        className={`group flex min-w-[120px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
-                    ${activeTab === 'quick-support' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
-                        onClick={() => setActiveTab('quick-support')}
+                        className={`group flex w-[150px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
+                    ${activeTab === 'notice' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
+                        onClick={() => setActiveTab('notice')}
                     >
-                        <IconUser fill={true} className="w-8 h-8" />
-
-                        <h5 className="font-bold text-black dark:text-white">Quick Support</h5>
+                        <IconClipboardText fill={true} className="w-8 h-8"/>
+                        <h5 className="font-bold text-black dark:text-white">{t('notice')}</h5>
                     </li>
                     <li
-                        className={`group flex min-w-[120px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
-                    ${activeTab === 'free-updates' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
-                        onClick={() => setActiveTab('free-updates')}
+                        className={`group flex w-[150px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
+                    ${activeTab === 'auction_mart' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
+                        onClick={() => setActiveTab('auction_mart')}
                     >
-                        <IconBox fill={true} />
+                        <IconBox fill={true} className="w-8 h-8"/>
 
-                        <h5 className="font-bold text-black dark:text-white">Free Updates</h5>
+                        <h5 className="font-bold text-black dark:text-white">{t('auction_mart')}</h5>
                     </li>
                     <li
-                        className={`group flex min-w-[120px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
-                    ${activeTab === 'pricing' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
-                        onClick={() => setActiveTab('pricing')}
+                        className={`group flex w-[150px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
+                    ${activeTab === 'report' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
+                        onClick={() => setActiveTab('report')}
                     >
-                        <IconDollarSignCircle fill={true} />
+                        <IconTrendingUp fill={true} className="w-8 h-8"/>
 
-                        <h5 className="font-bold text-black dark:text-white">Pricing</h5>
+                        <h5 className="font-bold text-black dark:text-white">{t('report')}</h5>
                     </li>
                     <li
-                        className={`group flex min-w-[120px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
-                    ${activeTab === 'hosting' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
-                        onClick={() => setActiveTab('hosting')}
+                        className={`group flex w-[150px] cursor-pointer flex-col items-center justify-center gap-4 rounded-md px-8 py-2.5 text-center text-[#506690] duration-300 hover:bg-white hover:text-primary dark:hover:bg-[#1B2E4B]
+                    ${activeTab === 'contact' ? 'bg-white text-primary dark:bg-[#1B2E4B]' : ''}`}
+                        onClick={() => setActiveTab('contact')}
                     >
-                        <IconRouter fill={true} />
+                        <IconTwitter fill={true} className="w-8 h-8"/>
 
-                        <h5 className="font-bold text-black dark:text-white">Hosting</h5>
+                        <h5 className="font-bold text-black dark:text-white">{t('contact')}</h5>
                     </li>
                 </ul>
             </div>
-            {guessLikes.length > 0 ? (
-                <>
-                    <h3 className="text-center text-xl font-semibold md:text-2xl">
-                        {t('today_star')}
-                    </h3>
-                    <div className="panel mt-2 md:mt-5">
-                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-6">
-                            {guessLikes.map((item: any, i: number) => {
-                                return (
-                                    <div key={item.id} className={`${i%4 === 0 ? 'col-start-2': ''} space-y-5 rounded-md border border-white-light bg-white p-5 shadow-[0px_0px_2px_0px_rgba(145,158,171,0.20),0px_12px_24px_-4px_rgba(145,158,171,0.12)] dark:border-[#1B2E4B] dark:bg-black`}>
-                                        <div className="h-56 overflow-hidden rounded-md">
-                                            <img src={item.photo} alt="..." className="w-full object-cover" />
-                                        </div>
-                                        <div>
-                                            <p className="text-base font-semibold dark:text-white">{item.title}</p>
-                                            <p className="dark:text-white mt-2">{item.subdescr}</p>
-                                            <p className="dark:text-white mt-4">
-                                                <span className='float-left'>销量 {item.quantity}</span>
-                                                <span className='float-right'>价格 <span className="text-primary line-through">{item.origPrice}</span> <span className="text-red-500">{item.price}</span></span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </>
-            ): ''}
-            
+
+            <Outlet/>
+
             <div className="text-center dark:text-white-dark my-5">© {new Date().getFullYear()}. Vristo All rights reserved.</div>
         </div>
     );

@@ -1,7 +1,6 @@
 // 封装请求
 import axios from 'axios'
-import Swal from 'sweetalert2'
-import { toast } from '../components/Toast'
+import { confirm, toast } from '../components/Toast'
 
 // 请求
 const http = axios.create({
@@ -50,19 +49,9 @@ http.interceptors.response.use(
 )
 
 function gotoLogin(title: string, content: string){
-    Swal.fire({
-        title: title,
-        text: content,
-        confirmButtonText: '登录',
-        showCancelButton: true,
-        cancelButtonText: '取消',
-        padding: '2em',
-        customClass: 'sweet-alerts',
-    }).then((result) => {
-        if (result.value) {
-            window.location.href='/auth/login'
-        }
-    });
+    confirm({title, text: content}, () => {
+        window.location.href='/auth/login'
+    })
 }
 
 type ReCfg = {
@@ -70,13 +59,13 @@ type ReCfg = {
     method?: 'get' | 'post' | 'put' | 'delete';
     params?: any;
     data?: any;
-    fun?: Function;
+    fetched?: Function;
 }
 
-async function request({ method = 'get', url, data = {}, params = {}, fun }: ReCfg) {
+async function request({ method = 'get', url, data = {}, params = {}, fetched }: ReCfg) {
     const rdata = await http({method, url, data, params})
     if(!rdata) return
-    if(fun) fun(rdata.data)
+    if(fetched) fetched(rdata.data)
 }
 
 export default request
