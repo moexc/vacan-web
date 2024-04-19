@@ -109,7 +109,9 @@ const Index = () => {
                 </ul>
             </div>
 
-            <Outlet/>
+            <div className='mx-60 min-h-[400px]'>
+                <Outlet/>
+            </div>
 
             <div className="text-center dark:text-white-dark my-5">© {new Date().getFullYear()}. Vristo All rights reserved.</div>
         </div>
