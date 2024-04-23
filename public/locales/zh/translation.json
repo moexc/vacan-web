@@ -24,6 +24,9 @@
 
     "sales": "销量",
     "price": "价格",
+    "start_time": "开始时间",
+    "status": "状态",
+    "bid_count": "标的数",
 
     "page_index": "首页",
     "page_group_apps": "功能",

@@ -21,7 +21,6 @@ import { logout as rdxlogout } from '../../store/authStore';
 import IconUser from '../Icon/IconUser';
 
 const Header = () => {
-    const location = useLocation();
     useEffect(() => {
 
     }, []);
@@ -39,10 +38,6 @@ const Header = () => {
 
     const gotoLogin = () => {
         navigate('/auth/login')
-    }
-
-    const gotoHome = () => {
-        navigate('/home')
     }
 
     function createMarkup(messages: any) {
@@ -116,8 +111,8 @@ const Header = () => {
 
     return (
         <header className={`z-40 ${themeConfig.semidark && themeConfig.menu === 'horizontal' ? 'dark' : ''}`}>
-            <div className="shadow-sm">
-                <div className="relative bg-white flex w-full items-center px-5 py-2.5 dark:bg-black">
+            <div className="shadow-sm bg-primary-light dark:bg-black mb-0.5">
+                <div className="relative flex w-full items-center px-5 py-2.5">
                     <div className="horizontal-logo flex lg:hidden justify-between items-center ltr:mr-2 rtl:ml-2">
                         <Link to="/" className="main-logo flex items-center shrink-0">
                             <img className="w-8 ltr:-ml-1 rtl:-mr-1 inline" src="/assets/images/logo.svg" alt="logo" />

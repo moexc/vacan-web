@@ -24,6 +24,9 @@
 
     "sales": "Sales",
     "price": "Price",
+    "start_time": "Start Time",
+    "status": "Status",
+    "bid_count": "Bid Count",
 
     "page_index": "Index",
     "page_group_apps": "apps",
