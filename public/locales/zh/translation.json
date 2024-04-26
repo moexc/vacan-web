@@ -30,6 +30,15 @@
     "fax": "传真",
     "address": "地址",
 
+    "trade_name": "专场名称",
+    "bid_name": "标的名称",
+    "start_price": "起拍价",
+    "bid_price": "竞价幅度",
+    "count_down": "倒计时",
+    "reset_cd": "出价延时",
+    "add_bid": "添加标的",
+    "save": "保存",
+
     "sales": "销量",
     "price": "价格",
     "start_time": "开始时间",
@@ -38,6 +47,9 @@
 
     "page_index": "首页",
     "page_group_apps": "功能",
-    "page_trade": "专场设置"
+    "page_trade": "专场设置",
 
+    "required": "必填",
+    "integer": "整数",
+    "min": "大于等于"
 }

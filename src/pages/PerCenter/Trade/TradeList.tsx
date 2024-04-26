@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigStore';
 import { useTranslation } from 'react-i18next';
 
-import { getTrades } from '../../../config/api/trade';
+import { deleteTradeApi, getTradesApi } from '../../../config/api/trade';
 import {parse} from '../../../util/time'
 import { useNavigate } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ const Trade = () => {
 
     function reqTradeNotice(){
         setFetching(true)
-        getTrades({}, page, pageSize, (data: any) => {
+        getTradesApi({}, page, pageSize, (data: any) => {
             setTotalRecord(data.total)
             setRecordsData(data.data)
             setFetching(false)
@@ -52,6 +52,10 @@ const Trade = () => {
 
     const toTradeAddPage = () => {
         navigate('/trade/add')
+    }
+
+    const deleteTrade = (tradeId: string) => {
+        deleteTradeApi(tradeId, reqTradeNotice)
     }
 
     return(
@@ -80,10 +84,15 @@ const Trade = () => {
                             },
                             { accessor: 'status', title: '专场状态'},
                             { accessor: 'sendStatus', title: '发送引擎状态'},
-                            { accessor: 'aution', title: '操作', 
+                            { accessor: 'aution', title: '操作',
                                 render: ({ sendStatus, id }) => {
                                     if(sendStatus !== '成功'){
-                                        return <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => send(id)} key={id}>发送</button>
+                                        return (
+                                            <div className='flex flex-wrap items-center justify-center gap-2'>
+                                                <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => send(id)}>发送</button>
+                                                <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => deleteTrade(id)}>删除</button>
+                                            </div>
+                                        )
                                     }else{
                                         return ''
                                     }

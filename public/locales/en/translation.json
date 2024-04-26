@@ -30,6 +30,15 @@
     "fax": "fax",
     "address": "Address",
 
+    "trade_name": "Trade Name",
+    "bid_name": "Bid Name",
+    "start_price": "Start Price",
+    "bid_price": "Bid Price",
+    "count_down": "Count Down",
+    "reset_cd": "Reset Cd",
+    "add_bid": "Add Bid",
+    "save": "Save",
+
     "sales": "Sales",
     "price": "Price",
     "start_time": "Start Time",
@@ -38,6 +47,9 @@
 
     "page_index": "Index",
     "page_group_apps": "apps",
-    "page_trade": "Trade"
-    
+    "page_trade": "Trade",
+
+    "required": "required",
+    "integer": "integer",
+    "min": "min"
 }
