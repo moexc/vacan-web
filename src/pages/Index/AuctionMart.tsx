@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getPushed } from "../../config/api/trade"
+import { getPushedApi } from "../../config/api/trade"
 import {parse} from '../../util/time'
 import { useTranslation } from "react-i18next"
 
@@ -11,7 +11,7 @@ const AuctionMart = () => {
     }, [])
 
     const loadTrades = () => {
-        getPushed(setTrades)
+        getPushedApi(setTrades)
     }
 
     return(

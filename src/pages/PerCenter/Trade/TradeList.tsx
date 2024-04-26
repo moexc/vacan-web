@@ -99,7 +99,7 @@ const Trade = () => {
                                 },
                             },
                         ]}
-                        idAccessor="zcggId"
+                        idAccessor="id"
                         fetching={fetching}
                         totalRecords={totalRecord}
                         recordsPerPage={pageSize}
