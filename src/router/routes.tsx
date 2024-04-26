@@ -15,7 +15,8 @@ const Error = lazy(() => import('../pages/Pages/Error'));
 const Login = lazy(() => import('../pages/Authentication/Login'));
 const Register = lazy(() => import('../pages/Authentication/Register'));
 const RecoverIdBoxed = lazy(() => import('../pages/Authentication/RecoverIdBox'));
-const Trade = lazy(() => import('../pages/PerCenter/Trade'));
+const TradeList = lazy(() => import('../pages/PerCenter/Trade/TradeList'));
+const TradeAdd = lazy(() => import('../pages/PerCenter/Trade/TradeAdd'));
 
 const routes = [
     {path: '/', element: <Index />, layout: 'blank', auth: false, 
@@ -30,7 +31,8 @@ const routes = [
     },
     // 个人中心
     {path: '/home', element: <Home />},
-    {path: '/trade', element: <Trade />},
+    {path: '/trade', element: <TradeList />},
+    {path: '/trade/add', element: <TradeAdd />},
     // 登录、注册
     {path: '/auth/login',element: <Login />,layout: 'blank',auth: false},
     {path: '/auth/register',element: <Register />,layout: 'blank',auth: false},

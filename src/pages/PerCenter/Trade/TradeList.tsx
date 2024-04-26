@@ -6,9 +6,11 @@ import { useTranslation } from 'react-i18next';
 
 import { getTrades } from '../../../config/api/trade';
 import {parse} from '../../../util/time'
+import { useNavigate } from 'react-router-dom';
 
 const Trade = () => {
     const {t} = useTranslation()
+    const navigate = useNavigate()
     const dispatch = useDispatch();
     useEffect(() => {
         dispatch(setPageTitle(t('page_trade')));
@@ -48,10 +50,19 @@ const Trade = () => {
         console.log('send', id);
     }
 
+    const toTradeAddPage = () => {
+        navigate('/trade/add')
+    }
+
     return(
         <div>
             <div className="panel">
                 <h5 className="font-semibold text-lg dark:text-white-light mb-5">专场列表</h5>
+                <div className="mb-4.5 flex md:items-center md:flex-row flex-col gap-5">
+                    <div className="ltr:ml-auto rtl:mr-auto">
+                        <button type="button" className="btn btn-primary" onClick={toTradeAddPage}>添加</button>
+                    </div>
+                </div>
                 <div className="datatables">
                     <DataTable
                         noRecordsText="无数据"
