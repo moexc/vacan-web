@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { deleteTradeApi, getTradesApi } from '../../../config/api/trade';
 import {parse} from '../../../util/time'
 import { useNavigate } from 'react-router-dom';
+import { simpleCfm } from '../../../components/Toast';
 
 const Trade = () => {
     const {t} = useTranslation()
@@ -46,7 +47,7 @@ const Trade = () => {
         reqTradeNotice()
     }
 
-    const send = async (id: string) => {
+    const sendTrade = async (id: string) => {
         console.log('send', id);
     }
 
@@ -55,7 +56,11 @@ const Trade = () => {
     }
 
     const deleteTrade = (tradeId: string) => {
-        deleteTradeApi(tradeId, reqTradeNotice)
+        simpleCfm('确认删除吗？', () => deleteTradeApi(tradeId, reqTradeNotice))
+    }
+
+    const editTrade = (tradeId: string) => {
+        navigate('/trade/edit', {state: {tradeId}})
     }
 
     return(
@@ -75,8 +80,8 @@ const Trade = () => {
                         records={recordsData}
                         columns={[
                             { accessor: 'id', title: 'ID'},
-                            { accessor: 'name', title: '专场名称'},
-                            { accessor: 'startTime', title: '开始时间',
+                            { accessor: 'name', title: t('trade_name')},
+                            { accessor: 'startTime', title: t('start_time'),
                                 render: ({ startTime }) => startTime ? parse(startTime) : '',
                             },
                             { accessor: 'endTime', title: '结束时间',
@@ -89,7 +94,8 @@ const Trade = () => {
                                     if(sendStatus !== '成功'){
                                         return (
                                             <div className='flex flex-wrap items-center justify-center gap-2'>
-                                                <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => send(id)}>发送</button>
+                                                <button type="button" className="btn btn-outline-primary btn-sm" onClick={() => sendTrade(id)}>发送</button>
+                                                <button type="button" className="btn btn-outline-warning btn-sm" onClick={() => editTrade(id)}>修改</button>
                                                 <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => deleteTrade(id)}>删除</button>
                                             </div>
                                         )

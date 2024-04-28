@@ -26,6 +26,7 @@ const DateInput: FC<{
         <Flatpickr
         name={name}
         data-enable-time
+        value={value}
         options={{
             ...options,
             locale: {

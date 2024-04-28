@@ -49,6 +49,9 @@
     "page_group_apps": "apps",
     "page_trade": "Trade",
 
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+
     "required": "required",
     "integer": "integer",
     "min": "min"

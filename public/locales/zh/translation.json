@@ -49,6 +49,9 @@
     "page_group_apps": "功能",
     "page_trade": "专场设置",
 
+    "confirm": "确定",
+    "cancel": "取消",
+
     "required": "必填",
     "integer": "整数",
     "min": "大于等于"

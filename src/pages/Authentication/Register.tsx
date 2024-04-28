@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { RegisterData, registerapi } from '../../config/api/user';
+import { toast } from '../../components/Toast';
 
 const RegisterBoxed = () => {
     const {t} = useTranslation()
@@ -32,12 +33,11 @@ const RegisterBoxed = () => {
         password: Yup.string().required(t('enter_password')),
     });
 
-    const toRegister = async(formValue: RegisterData) => {
-        const rst = await registerapi(formValue);
-        if(rst){
-            alert("注册成功，即将跳转到登录页面...")
+    const toRegister = (formValue: RegisterData) => {
+        registerapi(formValue, () => {
+            toast("注册成功，即将跳转到登录页面...")
             navigate('/auth/login');
-        }
+        });
     }
 
     return (

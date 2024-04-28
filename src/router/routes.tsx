@@ -33,6 +33,7 @@ const routes = [
     {path: '/home', element: <Home />},
     {path: '/trade', element: <TradeList />},
     {path: '/trade/add', element: <TradeAdd />},
+    {path: '/trade/edit', element: <TradeAdd />},
     // 登录、注册
     {path: '/auth/login',element: <Login />,layout: 'blank',auth: false},
     {path: '/auth/register',element: <Register />,layout: 'blank',auth: false},

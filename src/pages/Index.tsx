@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { setPageTitle } from '../store/themeConfigStore';
 import { useDispatch } from 'react-redux';
 import IconBox from '../components/Icon/IconBox';
@@ -110,7 +110,9 @@ const Index = () => {
             </div>
 
             <div className='mx-60 min-h-[400px]'>
-                <Outlet/>
+                <Suspense>
+                    <Outlet/>
+                </Suspense>
             </div>
 
             <div className="text-center dark:text-white-dark my-5">© {new Date().getFullYear()}. Vristo All rights reserved.</div>

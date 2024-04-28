@@ -1,24 +1,17 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import DateInput from '../../../components/DateInput';
 import IconX from '../../../components/Icon/IconX';
-import IconDownload from '../../../components/Icon/IconDownload';
-import IconEye from '../../../components/Icon/IconEye';
-import IconSend from '../../../components/Icon/IconSend';
-import IconSave from '../../../components/Icon/IconSave';
-import {parseDate} from '../../../util/time'
-import { createTradeApi } from '../../../config/api/trade';
+import { createTradeApi, getTradeDetailApi, updateTradeApi } from '../../../config/api/trade';
 import * as Yup from 'yup'
-import { Field, FieldArray, Form, Formik } from 'formik';
+import { Field, FieldArray, Form, Formik, useField } from 'formik';
 import { useTranslation } from 'react-i18next';
 
 const TradeAdd = () => {
     const {t} = useTranslation()
     const navigate = useNavigate()
-    useEffect(() => {
-        
-    });
+    const location = useLocation()
+    const tradeId = location.state && location.state.tradeId
 
     const defaultItem = {
         name: '',
@@ -26,6 +19,28 @@ const TradeAdd = () => {
         bidPrice: 10,
         countDown: 60,
         resetCd: 30,
+    }
+
+    const [initialValues, setInitialValues] = useState({
+        tradeName: '',
+        startTime: '',
+        bids: [defaultItem],
+    });
+
+    useEffect(() => {
+        loadInitTrade()
+    }, []);
+
+    const loadInitTrade = () => {
+        tradeId && getTradeDetailApi(tradeId, setInitialValues)
+    }
+
+    const saveTrade = (data: any) => {
+        tradeId ? updateTradeApi(tradeId, data, gotoTradedListPage) : createTradeApi(data, gotoTradedListPage)
+    }
+
+    const gotoTradedListPage = () => {
+        navigate('/trade')
     }
 
     const required = t('required')
@@ -43,24 +58,13 @@ const TradeAdd = () => {
                 countDown: Yup.number().nullable().required(required).integer(integer).min(1, `${min}1`),
                 resetCd: Yup.number().nullable().required(required).integer(integer).min(1, `${min}1`),
             })
-        ).min(1, '至少一个标的')
+        ).min(1)
     })
-
-    const saveTrade = (data: any) => {
-        createTradeApi(data, createTraded)
-    }
-
-    const createTraded = () => {
-        navigate('/trade')
-    }
 
     return (
         <Formik
-        initialValues={{
-            tradeName: '',
-            startTime: '',
-            bids: [defaultItem],
-        }}
+        enableReinitialize
+        initialValues={initialValues}
         validationSchema={tradeSchema}
         onSubmit={ data => saveTrade(data) }
         >
@@ -159,7 +163,7 @@ const TradeAdd = () => {
                                             {values.bids.length <= 0 && (
                                                 <tr>
                                                     <td colSpan={6} className="!text-center font-semibold">
-                                                        No Item Available
+                                                        <div className="text-danger mt-1">至少一个标的</div>
                                                     </td>
                                                 </tr>
                                             )}
@@ -187,8 +191,13 @@ const TradeAdd = () => {
                         <div className="panel">
                             <div className="grid xl:grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-4">
                                 <button type="submit" className="btn btn-success w-full gap-2">
-                                    <IconSave className="ltr:mr-2 rtl:ml-2 shrink-0" />
                                     {t('save')}
+                                </button>
+                                <button className="btn btn-warning w-full gap-2" onClick={(e) => {
+                                    e.stopPropagation
+                                    gotoTradedListPage()
+                                    }}>
+                                    {t('cancel')}
                                 </button>
                             </div>
                         </div>

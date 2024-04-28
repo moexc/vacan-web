@@ -15,6 +15,10 @@ export const toast = (text: string, color: 'primary'| 'success' | 'info' | 'warn
     });
 }
 
+export const simpleCfm = (text: string, confirmed: Function, canceled?: Function) => {
+    return confirm({text}, confirmed, canceled)
+}
+
 export const confirm = (options: SweetAlertOptions, confirmed: Function, canceled?: Function) => {
     Swal.fire({
         ...options,
