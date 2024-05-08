@@ -2,18 +2,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import DateInput from '../../../components/DateInput';
 import IconX from '../../../components/Icon/IconX';
-import { createTradeApi, getTradeDetailApi, updateTradeApi } from '../../../config/api/trade';
+import { Trade, Bid, createTradeApi, getTradeDetailApi, updateTradeApi } from '../../../config/api/trade';
 import * as Yup from 'yup'
-import { Field, FieldArray, Form, Formik, useField } from 'formik';
+import { Field, FieldArray, Form, Formik, FormikErrors } from 'formik';
 import { useTranslation } from 'react-i18next';
 
-const TradeAdd = () => {
+const TradeComplie = () => {
     const {t} = useTranslation()
     const navigate = useNavigate()
     const location = useLocation()
     const tradeId = location.state && location.state.tradeId
 
-    const defaultItem = {
+    const defaultItem: Bid = {
         name: '',
         startPrice: 10,
         bidPrice: 10,
@@ -21,7 +21,7 @@ const TradeAdd = () => {
         resetCd: 30,
     }
 
-    const [initialValues, setInitialValues] = useState({
+    const [initialValues, setInitialValues] = useState<Trade>({
         tradeName: '',
         startTime: '',
         bids: [defaultItem],
@@ -35,7 +35,7 @@ const TradeAdd = () => {
         tradeId && getTradeDetailApi(tradeId, setInitialValues)
     }
 
-    const saveTrade = (data: any) => {
+    const saveTrade = (data: Trade) => {
         tradeId ? updateTradeApi(tradeId, data, gotoTradedListPage) : createTradeApi(data, gotoTradedListPage)
     }
 
@@ -58,7 +58,7 @@ const TradeAdd = () => {
                 countDown: Yup.number().nullable().required(required).integer(integer).min(1, `${min}1`),
                 resetCd: Yup.number().nullable().required(required).integer(integer).min(1, `${min}1`),
             })
-        ).min(1)
+        ).min(1, '最少一个标的')
     })
 
     return (
@@ -103,7 +103,7 @@ const TradeAdd = () => {
                             </div>
                         </div>
                         <hr className="border-white-light dark:border-[#1b2e4b] my-6" />
-                        
+
                         <FieldArray
                         name='bids'
                         render={({insert, remove, push}) => (
@@ -126,32 +126,32 @@ const TradeAdd = () => {
                                                     <td>
                                                         <Field name={`bids.${index}.name`} type="text" className="form-input min-w-[200px]"/>
                                                         {touched.bids && touched.bids[index] && touched.bids[index].name 
-                                                        && errors.bids && errors.bids[index] && errors.bids[index].name ? 
-                                                        <div className="text-danger mt-1">{errors.bids[index].name}</div> : null}
+                                                        && errors.bids && errors.bids[index] && (errors.bids[index] as FormikErrors<Bid>).name ? 
+                                                        <div className="text-danger mt-1">{(errors.bids[index] as FormikErrors<Bid>).name}</div> : null}
                                                     </td>
                                                     <td>
                                                         <Field name={`bids.${index}.startPrice`} type="number" className="form-input w-32" min={1}/>
                                                         {touched.bids && touched.bids[index] && touched.bids[index].startPrice 
-                                                        && errors.bids && errors.bids[index] && errors.bids[index].startPrice ? 
-                                                        <div className="text-danger mt-1">{errors.bids[index].startPrice}</div> : null}
+                                                        && errors.bids && errors.bids[index] && (errors.bids[index] as FormikErrors<Bid>).startPrice ? 
+                                                        <div className="text-danger mt-1">{(errors.bids[index] as FormikErrors<Bid>).startPrice}</div> : null}
                                                     </td>
                                                     <td>
                                                         <Field name={`bids.${index}.bidPrice`} type="number" className="form-input w-32" min={1}/>
                                                         {touched.bids && touched.bids[index] && touched.bids[index].bidPrice 
-                                                        && errors.bids && errors.bids[index] && errors.bids[index].bidPrice ? 
-                                                        <div className="text-danger mt-1">{errors.bids[index].bidPrice}</div> : null}
+                                                        && errors.bids && errors.bids[index] && (errors.bids[index] as FormikErrors<Bid>).bidPrice ? 
+                                                        <div className="text-danger mt-1">{(errors.bids[index] as FormikErrors<Bid>).bidPrice}</div> : null}
                                                     </td>
                                                     <td>
                                                         <Field name={`bids.${index}.countDown`} type="number" className="form-input w-32" min={1} />
                                                         {touched.bids && touched.bids[index] && touched.bids[index].countDown 
-                                                        && errors.bids && errors.bids[index] && errors.bids[index].countDown ? 
-                                                        <div className="text-danger mt-1">{errors.bids[index].countDown}</div> : null}
+                                                        && errors.bids && errors.bids[index] && (errors.bids[index] as FormikErrors<Bid>).countDown ? 
+                                                        <div className="text-danger mt-1">{(errors.bids[index] as FormikErrors<Bid>).countDown}</div> : null}
                                                     </td>
                                                     <td>
                                                         <Field name={`bids.${index}.resetCd`} type="number" className="form-input w-32" min={1} />
                                                         {touched.bids && touched.bids[index] && touched.bids[index].resetCd 
-                                                        && errors.bids && errors.bids[index] && errors.bids[index].resetCd ? 
-                                                        <div className="text-danger mt-1">{errors.bids[index].resetCd}</div> : null}
+                                                        && errors.bids && errors.bids[index] && (errors.bids[index] as FormikErrors<Bid>).resetCd ? 
+                                                        <div className="text-danger mt-1">{(errors.bids[index] as FormikErrors<Bid>).resetCd}</div> : null}
                                                     </td>
                                                     <td>
                                                         <button type="button" onClick={() => remove(index)}>
@@ -160,10 +160,10 @@ const TradeAdd = () => {
                                                     </td>
                                                 </tr>
                                             )}
-                                            {values.bids.length <= 0 && (
+                                            {typeof errors.bids === 'string' && (
                                                 <tr>
                                                     <td colSpan={6} className="!text-center font-semibold">
-                                                        <div className="text-danger mt-1">至少一个标的</div>
+                                                        <div className="text-danger mt-1">{errors.bids}</div>
                                                     </td>
                                                 </tr>
                                             )}
@@ -171,16 +171,15 @@ const TradeAdd = () => {
                                     </table>
                                     </div>
                                     <div className="flex justify-between sm:flex-row flex-col mt-6 px-4">
+                                        <div className="sm:w-1/6">
+                                            <div className="flex items-center justify-between mt-4 font-semibold">
+                                                <div>{t('bid_count')} : <span className='text-blue-500 ml-3'>{values.bids.length}</span></div>
+                                            </div>
+                                        </div>
                                         <div className="sm:mb-0 mb-6">
                                             <button type="button" className="btn btn-primary" onClick={() => push(defaultItem)}>
                                                 {t('add_bid')}
                                             </button>
-                                        </div>
-                                        <div className="sm:w-1/6">
-                                            <div className="flex items-center justify-between mt-4 font-semibold">
-                                                <div>{t('bid_count')}</div>
-                                                <div className='text-blue-500'>{values.bids.length}</div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -209,4 +208,4 @@ const TradeAdd = () => {
     );
 };
 
-export default TradeAdd;
+export default TradeComplie;

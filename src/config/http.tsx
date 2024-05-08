@@ -60,12 +60,27 @@ type ReCfg = {
     params?: any;
     data?: any;
     fetched?: Function;
+    fetchedata?: (data: any) => void,
+    form?: boolean
 }
 
-async function request({ method = 'get', url, data = {}, params = {}, fetched }: ReCfg) {
-    const rdata = await http({method, url, data, params})
+async function request({ 
+    method = 'get', 
+    url, 
+    data = {}, 
+    params = {}, 
+    fetched, 
+    fetchedata = (data) => {
+        // console.log(data);
+    },
+    form = false
+}: ReCfg) {
+    
+    const rdata = !form ? await http({method, url, data, params})
+                        : await http({method, url, data, params, headers: {'Content-Type': `multipart/form-data; boundary=${data._boundary}`}}) 
     if(!rdata) return
-    if(fetched) fetched(rdata.data)
+    fetched && fetched(rdata.data)
+    fetchedata && fetchedata(rdata)
 }
 
 export default request

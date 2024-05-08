@@ -25,7 +25,7 @@ const Trade = () => {
 
     useEffect(() => {
         reqTradeNotice()
-    }, []);
+    }, [page, pageSize]);
 
     function reqTradeNotice(){
         setFetching(true)
@@ -38,13 +38,11 @@ const Trade = () => {
 
     const changePage = (page: number) => {
         setPage(page)
-        reqTradeNotice()
     }
 
     const changePageSize = (pageSize: number) => {
         setPage(1)
         setPageSize(pageSize)
-        reqTradeNotice()
     }
 
     const sendTrade = async (id: string) => {
@@ -66,8 +64,8 @@ const Trade = () => {
     return(
         <div>
             <div className="panel">
-                <h5 className="font-semibold text-lg dark:text-white-light mb-5">专场列表</h5>
                 <div className="mb-4.5 flex md:items-center md:flex-row flex-col gap-5">
+                    <h5 className="font-semibold text-lg dark:text-white-light">专场列表</h5>
                     <div className="ltr:ml-auto rtl:mr-auto">
                         <button type="button" className="btn btn-primary" onClick={toTradeAddPage}>添加</button>
                     </div>

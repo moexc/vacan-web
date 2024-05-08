@@ -1,5 +1,19 @@
 import request from '../http'
 
+export type Trade = {
+    tradeName: string,
+    startTime: string,
+    bids: Bid[],
+}
+
+export type Bid = {
+    name: string,
+    startPrice: number,
+    bidPrice: number,
+    countDown: number,
+    resetCd: number,
+}
+
 /**
  * 获取专场列表
  * @param searchCondit 查询条件
@@ -18,7 +32,7 @@ export const getTradesApi = (searchCondit: any, page: number, rows: number, fetc
  * @param fetched callback
  * @returns 
  */
-export const createTradeApi = (data: any, fetched : Function) => request({url:'/api/trade', method: 'post', data, fetched})
+export const createTradeApi = (data: Trade, fetched : Function) => request({url:'/api/trade', method: 'post', data, fetched})
 
 /**
  * 获取专场详情
@@ -35,7 +49,7 @@ export const getTradeDetailApi = (tradeId: string, fetched: Function) => request
  * @param fetched callback
  * @returns 
  */
-export const updateTradeApi = (tradeId: string, data: any, fetched: Function) => request({url: `/api/trade/${tradeId}`, method: 'put', data, fetched})
+export const updateTradeApi = (tradeId: string, data: Trade, fetched: Function) => request({url: `/api/trade/${tradeId}`, method: 'put', data, fetched})
 
 /**
  * 删除专场
