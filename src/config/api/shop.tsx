@@ -23,8 +23,24 @@ export const getGoodsApi = (searchCondit: any, page: number, rows: number, fetch
     url:'/api/goods/search', method:'post', data: searchCondit, params:{page, rows}, fetched
 })
 
+/**
+ * 创建新商品
+ * @param data Goods
+ * @param fetched callback
+ * @returns 
+ */
 export const createGoodsApi = (data: Goods, fetched: Function) => request({
     url: '/api/goods', method: 'post', data, fetched, form: true
+})
+
+/**
+ * 获取商品详情
+ * @param id 商品ID
+ * @param fetched callback
+ * @returns 
+ */
+export const getGoodsDetailApi = (id: string, fetched: Function) => request({
+    url: `/api/goods/${id}`, fetched
 })
 
 /**

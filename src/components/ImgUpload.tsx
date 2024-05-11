@@ -20,6 +20,7 @@ const ImgUpload: FC <{
     return (
         <ImageUploading
         value={[]}
+        maxFileSize={3 * 1024 * 1024} // 设置最大文件大小为3MB
         onChange={onChange}
         maxNumber={1}
         dataURLKey="data_url"

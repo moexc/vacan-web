@@ -41,6 +41,7 @@ const routes = [
     {path: '/trade/edit', element: <TradeCompile />},
     {path: '/goods', element: <GoodsList />},
     {path: '/goods/add', element: <GoodsCompile />},
+    {path: '/goods/edit', element: <GoodsCompile />},
     // 登录、注册
     {path: '/auth/login',element: <Login />,layout: 'blank',auth: false},
     {path: '/auth/register',element: <Register />,layout: 'blank',auth: false},

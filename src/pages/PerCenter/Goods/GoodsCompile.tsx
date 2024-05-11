@@ -1,15 +1,18 @@
 import { Field, Form, Formik, useField } from "formik";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from 'yup'
-import { Goods, createGoodsApi } from "../../../config/api/shop";
+import { Goods, createGoodsApi, getGoodsDetailApi } from "../../../config/api/shop";
 import ImgUpload from "../../../components/ImgUpload";
+import FileUpload from "../../../components/FileUpload";
 
 
 const GoodsCompile = () => {
     const {t} = useTranslation()
     const navigate = useNavigate()
+    const location = useLocation()
+    const goodsId = location.state && location.state.goodsId
 
     const [initialValues, setInitialValues] = useState<Goods>({
         title: '',
@@ -61,7 +64,15 @@ const GoodsCompile = () => {
                 <div className="flex xl:flex-row flex-col gap-2.5">
                     <div className="panel px-0 flex-1 py-6 ltr:xl:mr-6 rtl:xl:ml-6">
                         <div className="justify-between flex-wrap px-4">
-
+                            <FileUpload 
+                            name="myfiles" 
+                            type='img' 
+                            // width={400}
+                            // imgView="h-10 w-10"
+                            maxFileCount={4}
+                            onFaild={(msg) => alert(msg)}
+                            onChange={(fileTypes) => {console.log(fileTypes)}}
+                            />
                             <div className="lg:w-1/2 w-full lg:max-w-fit py-2">
                                 <div className="flex items-center">
                                     <label htmlFor="title" className="flex-1 ltr:mr-2 rtl:ml-2 mb-0 w-20 text-right">
@@ -130,7 +141,7 @@ const GoodsCompile = () => {
                                     <label htmlFor="detail" className="flex-1 ltr:mr-2 rtl:ml-2 mb-0 w-20 text-right">
                                         详情
                                     </label>
-                                    <Field type="text" name="detail" className="form-input lg:w-[250px] w-2/3"/>
+                                    <Field type="text" name="detail" className="form-input lg:w-[250px] w-2/3" />
                                     {touched.detail && errors.detail ? <div className="text-danger mt-1">{errors.detail}</div> : null}
                                 </div>
                             </div>

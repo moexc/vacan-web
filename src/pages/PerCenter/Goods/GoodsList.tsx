@@ -1,5 +1,5 @@
 import { DataTable } from 'mantine-datatable';
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigStore';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { getGoodsApi } from '../../../config/api/shop';
 import { useNavigate } from 'react-router-dom';
 import { simpleCfm } from '../../../components/Toast';
+import {parse} from '../../../util/time'
 
 const Goods = () => {
     const {t} = useTranslation()
@@ -21,6 +22,7 @@ const Goods = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [recordsData, setRecordsData] = useState([]);
     const [fetching, setFetching] = useState(false)
+    const canUp = ['00', '02', '04']
 
     useEffect(() => {
         reqGoods()
@@ -52,9 +54,13 @@ const Goods = () => {
         simpleCfm('确认删除吗？', () => {})
     }
 
-    const editGoods = (tradeId: string) => {
-        navigate('/goods/edit', {state: {tradeId}})
+    const editGoods = (goodsId: string) => {
+        navigate('/goods/edit', {state: {goodsId}})
     }
+
+    const UpBtn: FC<{id: string}> = ({id}) => <button type="button" className="btn btn-sm btn-primary">上架</button>
+    const DownBtn: FC<{id: string}> = ({id}) => <button type="button" className="btn btn-sm btn-warning">下架</button>
+    const ModfiyBtn: FC<{id: string}> = ({id}) => <button type="button" className="btn btn-sm btn-info" onClick={() => editGoods(id)}>修改</button>
 
     return(
         <div>
@@ -77,34 +83,46 @@ const Goods = () => {
                                 return <img src={photo} title={title} className='w-6'/>
                             }},
                             { accessor: 'title', title: '名称'},
-                            { accessor: 'origPrice', title: '原单价'},
-                            { accessor: 'price', title: '单价'},
-                            { accessor: 'quantity', title: '库存'},
-                            { accessor: 'status', title: '状态', render: ({status}) => {
+                            { accessor: 'origPrice', width:120, title: '原单价'},
+                            { accessor: 'price', width:120, title: '单价'},
+                            { accessor: 'quantity', width:120, title: '库存'},
+                            { accessor: 'createTime', width: 180, title: '创建时间', render: ({createTime}) => {
+                                return parse(createTime)
+                            }},
+                            { accessor: 'status', width:120, title: '状态', render: ({status}) => {
                                 if (status === '00'){
-                                    return '待审核'
+                                    return <span className="badge badge-outline-info">待审核</span>
                                 }else if (status === '01'){
-                                    return '审核不通过'
+                                    return <span className="badge badge-outline-danger">审核不通过</span>
                                 }else if (status === '02'){
-                                    return '审核通过'
+                                    return <span className="badge badge-outline-primary">审核通过</span>
                                 }else if (status === '03'){
-                                    return '已上架'
+                                    return <span className="badge badge-outline-success">已上架</span>
                                 }else if (status === '04'){
-                                    return '已下架'
+                                    return <span className="badge badge-outline-warning">已下架</span>
                                 }
                             }},
-                            { accessor: 'aution', title: '操作',
+                            { accessor: 'aution', width: 150, title: '操作',
                                 render: ({ status, id }) => {
-                                    if (status === '00'){
-                                        return '审核'
+                                    if (canUp.includes(status)){
+                                        return (
+                                            <div className='flex flex-wrap gap-2'>
+                                                <UpBtn id={id} />
+                                                <ModfiyBtn id={id} />
+                                            </div>
+                                        )
                                     }else if (status === '01'){
-                                        return '删除'
-                                    }else if (status === '02'){
-                                        return '上架'
+                                        return (
+                                            <div className='flex flex-wrap gap-2'>
+                                                <ModfiyBtn id={id} />
+                                            </div>
+                                        )
                                     }else if (status === '03'){
-                                        return '下架'
-                                    }else if (status === '04'){
-                                        return '重新上架'
+                                        return (
+                                            <div className='flex flex-wrap gap-2'>
+                                                <DownBtn id={id} />
+                                            </div>
+                                        )
                                     }
                                 },
                             },
