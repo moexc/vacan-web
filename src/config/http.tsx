@@ -19,10 +19,14 @@ http.interceptors.request.use(config => {
 // 响应拦截
 http.interceptors.response.use(
     response => {
-        return response.data
+        return response && response.data
     }, 
     err => {
         let response = err.response;
+        if(!response){
+            toast('服务器出现了点小问题 ⊙﹏⊙∥', 'danger')
+            return;
+        }
         switch(response.status) {
             case 400:
                 toast(`参数错误: ${response.data.msg}`, 'warning')

@@ -3,14 +3,23 @@ import IconPlusCircle from "./Icon/IconPlusCircle"
 import { sleep } from "../util/time"
 import IconXCircle from "./Icon/IconXCircle"
 import useSyncCallback from "../util/callbackState"
+import { fileUploadApi } from "../config/api/file"
 
 const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) => {
-    const {name, type = 'file', width = 350, imgView = 'w-20 h-20', maxFileCount = 1, maxFileSize, onFaild, onChange} = fileUploadOption
+    const {name, values = [], useDefaultView = true, type = 'file', width = 'w-[350px]', imgView = 'w-20 h-20', maxFileCount = 1, maxFileSize, onFaild, onChange} = fileUploadOption
     const isImg = type === 'img'
     const fileInput = document.getElementById(name)
 
     const currentChangeIdRef = useRef(-1)
     const [files, setFiles] = useState<FileType[]>([])
+
+    useEffect(() => {
+        setFiles(
+            values.map(v => {
+                return {id: new Date().getTime() + Math.random(), url: v, name: v.split('/').pop(), status: 'done'}
+            })
+        )
+    },[])
 
     useEffect(() => {
         onChange(files)
@@ -27,29 +36,44 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
 
         if(currentChangeId === -1) {
             currentChangeId = new Date().getTime()
-            setFiles(preState => [...preState, {id: currentChangeId, base64: "", file, status: 'uploading'}])
+            setFiles(preState => [...preState, {id: currentChangeId, url: "", name: file.name, file, status: 'uploading'}])
         }else{
-            const newFile: FileType = {id: currentChangeId, base64: "", file, status: 'uploading'}
+            const newFile: FileType = {id: currentChangeId, url: "", name: file.name, file, status: 'uploading'}
             modfiyFileType(newFile)
         }
         uploadFile(currentChangeId)
     }
 
-    const uploadFile = useSyncCallback((currentChangeId: number) => {
+    const uploadFile = useSyncCallback(async (currentChangeId: number) => {
         const fileType = files.filter(f => f.id === currentChangeId)[0]
+        const {file, id} = fileType
 
-        const reader = new FileReader();
-        reader.readAsDataURL(fileType.file);
-        reader.onload = async () => {
-            await sleep(3000)
-            const base64 = reader.result as string
+        if(file){
+            let res
+            await fileUploadApi(file, (resData) => {
+                res = resData
+            })
 
-            modfiyFileType({...fileType, base64, status: 'done'})
+            if(!res) {
+                removeFileType(id)
+                return
+            }
+            const {code, data: url, msg} = res
+            if(!code || code != 0){
+                onFaild && onFaild(msg)
+                removeFileType(id)
+                return
+            }
+            modfiyFileType({...fileType, url, status: 'done'}) 
         }
-        reader.onerror = (e) => {
-            onFaild && onFaild(fileType.file.name + 'uploadFaild')
-        }
+    })
 
+    const removeFileType = useSyncCallback((id: number) => {
+        setFiles(
+            files.filter(item => {
+                return item.id !== id
+            })
+        )
     })
 
     const modfiyFileType = useSyncCallback((fileType: FileType) => {
@@ -75,10 +99,11 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
     }
 
     return (
-        <div className={`grid ${isImg ? 'grid-cols-4' : 'grid-cols-1'} w-[${width}px]`}>
+        useDefaultView ? 
+        <div className={`grid ${isImg ? 'grid-cols-4' : 'grid-cols-1'} ${width}`}>
             {files.map((fileType, index) => {
                 return (
-                    <div key={`${name}_${index}`} className={`${!isImg && 'mb-2 border-blue-100 border-2 rounded-lg'}`}>
+                    <div key={`${name}_${index}`} className={`${!isImg && 'mb-2 border-blue-100 border-b-2 hover:bg-gray-200'}`}>
                         <div onClick={() => {updateFile(fileType.id)}} 
                         className={`relative 
                         ${isImg && `${imgView} border-blue-100 border-2 rounded-xl flex items-center justify-center`}
@@ -90,13 +115,13 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
                             `}/>
                             }
                             {isImg && fileType.status === 'done' && 
-                            <img src={fileType.base64} alt={fileType.file.name} className={`${imgView} rounded-xl`} />
+                            <img src={fileType.url} alt={fileType.name} className={`${imgView} rounded-xl`} />
                             }
                             {!isImg && fileType.status === 'done' && 
-                            <div className="rounded-sm h-6" >{fileType.file.name}</div>
+                            <div className="rounded-sm h-6 ml-2" >{fileType.name}</div>
                             }
                             <div onClick={(e) => {e.stopPropagation(); delFile(index)}}>
-                                <IconXCircle className="absolute top-[-10px] right-[-10px]"/>
+                                <IconXCircle className={`absolute ${isImg ? 'top-[-10px] right-[-10px]' : 'bottom-[0px] right-[0px]'}`}/>
                             </div>
                         </div>
                     </div>
@@ -105,7 +130,7 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
 
             {files.length < maxFileCount && 
                 <div onClick={() => updateFile(-1)} 
-                className={`flex items-center justify-center border-gray-200 border-2 border-dashed rounded-xl ${isImg && `${imgView}`}`}
+                className={`flex items-center justify-center border-gray-200 border-2 border-dashed rounded-xl ${isImg && imgView}`}
                 >
                     <IconPlusCircle className='w-7 h-7' />
                 </div>
@@ -113,13 +138,16 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
             
             <input type="file" className="hidden" id={name} onChange={(e: any) => {fileInputChange(e.target.files[0])}} />
         </div>
+        : null
     )
 }
 
 export type FileUploadOption = {
     name: string,
+    values?: string[]
+    useDefaultView?: boolean
     type?: 'img' | 'file'
-    width?: number
+    width?: string
     imgView?: string
     maxFileCount?: number
     maxFileSize?: number
@@ -129,8 +157,9 @@ export type FileUploadOption = {
 
 export type FileType = {
     id: number,
-    file: File,
-    base64: string,
+    file?: File,
+    name?: string,
+    url: string,
     status: 'uploading' | 'done'
 }
 

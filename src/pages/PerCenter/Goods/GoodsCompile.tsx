@@ -66,9 +66,10 @@ const GoodsCompile = () => {
                         <div className="justify-between flex-wrap px-4">
                             <FileUpload 
                             name="myfiles" 
-                            type='img' 
-                            // width={400}
-                            // imgView="h-10 w-10"
+                            type='img'
+                            values={['http://172.18.0.5:9000/vacan/1715047588395_wechat-tools-icon.png']}
+                            // width='w-[350px]'
+                            // imgView="h-20 w-20"
                             maxFileCount={4}
                             onFaild={(msg) => alert(msg)}
                             onChange={(fileTypes) => {console.log(fileTypes)}}
