@@ -11,12 +11,7 @@ const ImgUpload: FC <{
 }> = ({name, maxFileCount, maxFileSize, width}) => {
     const [field, meta, helper] = useField({ name })
     const { value } = meta
-    const { setValue} = helper
-
-    const v = (!value || value.length == 0) ? [] : (maxFileCount == 1 ? [value] : value)
-
-    console.log(v);
-    
+    const { setValue, setTouched } = helper
 
     const onImgChange = (fileType: FileType[]) => {
         setValue(maxFileCount == 1 ? fileType[0]?.url : fileType.map(v => v.url))
@@ -24,12 +19,13 @@ const ImgUpload: FC <{
 
     const onFaild = (msg: string) => {
         toast(msg, 'warning')
+        setTouched(true)
     }
 
     return (
         <FileUpload
         name={name}
-        values={v}
+        values={(!value || value.length == 0) ? [] : (maxFileCount == 1 ? [value] : value)}
         type="img"
         width={width}
         maxFileCount={maxFileCount}

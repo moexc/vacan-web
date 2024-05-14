@@ -92,7 +92,7 @@ const GoodsCompile = () => {
                                         图片
                                     </label>
                                     <ImgUpload name="photo" maxFileSize={1024*1024} maxFileCount={1} width="lg:w-[250px] w-2/3"/>
-                                    {touched.photo && errors.photo ? <div className="text-danger mt-1">{errors.photo}</div> : null}
+                                    {errors.photo ? <div className="text-danger mt-1">{errors.photo}</div> : null}
                                 </div>
                             </div>
                             <div className="lg:w-1/2 w-full lg:max-w-fit py-2">

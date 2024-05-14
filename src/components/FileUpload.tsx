@@ -1,7 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react"
 import IconPlusCircle from "./Icon/IconPlusCircle"
 import IconXCircle from "./Icon/IconXCircle"
-import useSyncCallback from "../util/callbackState"
 import { fileUploadApi } from "../config/api/file"
 import { typeDefine } from "../util/fileType"
 
@@ -32,21 +31,26 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
                 return typeDefine[v]
             }).join(',') || ''
         )
-        
-        setFiles(
-            values.map(v => {
-                return {id: new Date().getTime() + Math.random(), url: v, name: v.split('/').pop(), status: 'done'}
-            })
-        )
-    },[])
+    }, [])
+
+    useEffect(() => {
+        setFiles(values.map(v => {
+            return {id: new Date().getTime() + Math.random(), url: v, name: v.split('/').pop()}
+        }))
+    },[values])
 
     useEffect(() => {
         onChange(files)
-    }, [files])
+    }, [])
 
-    const fileInputChange = (file: File) => {
+    const fileInputChange = async (file: File) => {
         let currentChangeId = currentChangeIdRef.current
         currentChangeIdRef.current = -1
+
+        if(!file){
+            onFaild && onFaild('获取文件失败')
+            return
+        }
 
         const filename = file.name
         if(maxFileSize && file.size > maxFileSize){
@@ -60,64 +64,41 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
             return
         }
 
+        let res
+        await fileUploadApi(file, (resData) => {
+            res = resData
+        })
+
+        if(!res) {
+            onFaild && onFaild(`${filename}: 上传失败`)
+            return
+        }
+        const {code, data: url, msg} = res
+        if(code != 0){
+            onFaild && onFaild(msg)
+            return
+        }
+        let newFiles
         if(currentChangeId === -1) {
-            currentChangeId = new Date().getTime()
-            setFiles(preState => [...preState, {id: currentChangeId, url: "", name: file.name, file, status: 'uploading'}])
-        }else{
-            const newFile: FileType = {id: currentChangeId, url: "", name: file.name, file, status: 'uploading'}
-            modfiyFileType(newFile)
-        }
-        uploadFile(currentChangeId)
-    }
-
-    const uploadFile = useSyncCallback(async (currentChangeId: number) => {
-        const fileType = files.filter(f => f.id === currentChangeId)[0]
-        const {file, id} = fileType
-
-        if(file){
-            let res
-            await fileUploadApi(file, (resData) => {
-                res = resData
-            })
-
-            if(!res) {
-                removeFileType(id)
-                return
-            }
-            const {code, data: url, msg} = res
-            if(code != 0){
-                onFaild && onFaild(msg)
-                removeFileType(id)
-                return
-            }
-            modfiyFileType({...fileType, url, status: 'done'})
-        }
-    })
-
-    const removeFileType = useSyncCallback((id: number) => {
-        setFiles(
-            files.filter(item => {
-                return item.id !== id
-            })
-        )
-    })
-
-    const modfiyFileType = useSyncCallback((fileType: FileType) => {
-        setFiles(
-            files.map(item => {
-                if(item.id === fileType.id){
-                    return {...fileType}
+            newFiles = [...files, {id: new Date().getTime(), url , name: filename}]
+        } else {
+            newFiles = files.map(item => {
+                if(item.id === currentChangeId){
+                    return {id: currentChangeId, url , name: filename}
                 }else{
                     return item
                 }
             })
-        )
-    })
+        }
+        setFiles(newFiles)
+        onChange(newFiles)
+    }
 
-    const delFile = useSyncCallback((index: number) => {
+    const delFile = (index: number) => {
         files.splice(index, 1)
         setFiles([...files])
-    })
+        onChange([...files])
+    }
 
     const updateFile = (id: number) => {
         currentChangeIdRef.current = id
@@ -134,17 +115,8 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
                         className={`relative 
                         ${isImg && `${imgView} border-blue-100 border-2 rounded-xl flex items-center justify-center`}
                         }`}>
-                            {fileType.status === 'uploading' && 
-                            <span 
-                            className={`animate-spin border-8 border-[#f1f2f3] border-l-primary rounded-full inline-block align-middle m-auto 
-                            ${isImg ? {imgView} : 'w-4 h-4'}
-                            `}/>
-                            }
-                            {isImg && fileType.status === 'done' && 
-                            <img src={fileType.url} alt={fileType.name} className={`${imgView} rounded-xl`} />
-                            }
-                            {!isImg && fileType.status === 'done' && 
-                            <div className="rounded-sm h-6 ml-2" >{fileType.name}</div>
+                            {isImg ? <img src={fileType.url} alt={fileType.name} className={`${imgView} rounded-xl`} />
+                                    :<div className="rounded-sm h-6 ml-2" >{fileType.name}</div>
                             }
                             <div onClick={(e) => {e.stopPropagation(); delFile(index)}}>
                                 <IconXCircle className={`absolute ${isImg ? 'top-[-10px] right-[-10px]' : 'bottom-[0px] right-[0px]'}`}/>
@@ -184,10 +156,8 @@ export type FileUploadOption = {
 
 export type FileType = {
     id: number,
-    file?: File,
     name?: string,
     url: string,
-    status: 'uploading' | 'done'
 }
 
 export default FileUpload
