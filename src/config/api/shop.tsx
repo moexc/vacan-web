@@ -2,7 +2,7 @@ import request from '../http'
 
 export type Goods = {
     title: string,
-    photo?: File,
+    photo: string,
     subdescr: string,
     detail: string,
     oldPrice: number,
@@ -30,7 +30,18 @@ export const getGoodsApi = (searchCondit: any, page: number, rows: number, fetch
  * @returns 
  */
 export const createGoodsApi = (data: Goods, fetched: Function) => request({
-    url: '/api/goods', method: 'post', data, fetched, form: true
+    url: '/api/goods', method: 'post', data, fetched
+})
+
+/**
+ * 修改商品信息
+ * @param data Goods
+ * @param id ID
+ * @param fetched callback
+ * @returns 
+ */
+export const updateGoodsApi = (data: Goods, id: string, fetched: Function) => request({
+    url: `/api/goods/${id}`, method: 'put', data, fetched
 })
 
 /**

@@ -1,19 +1,38 @@
 import { FC, useEffect, useRef, useState } from "react"
 import IconPlusCircle from "./Icon/IconPlusCircle"
-import { sleep } from "../util/time"
 import IconXCircle from "./Icon/IconXCircle"
 import useSyncCallback from "../util/callbackState"
 import { fileUploadApi } from "../config/api/file"
+import { typeDefine } from "../util/fileType"
 
 const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) => {
-    const {name, values = [], useDefaultView = true, type = 'file', width = 'w-[350px]', imgView = 'w-20 h-20', maxFileCount = 1, maxFileSize, onFaild, onChange} = fileUploadOption
+    const {
+        name, 
+        values = [], 
+        acceptType,
+        useDefaultView = true, 
+        type = 'file', 
+        width = 'w-[350px]', 
+        imgView = 'w-20 h-20', 
+        maxFileCount = 1, 
+        maxFileSize, 
+        onFaild, 
+        onChange
+    } = fileUploadOption
     const isImg = type === 'img'
     const fileInput = document.getElementById(name)
 
     const currentChangeIdRef = useRef(-1)
+    const [accept, setAccept] = useState('')
     const [files, setFiles] = useState<FileType[]>([])
 
     useEffect(() => {
+        setAccept(
+            acceptType?.map(v => {
+                return typeDefine[v]
+            }).join(',') || ''
+        )
+        
         setFiles(
             values.map(v => {
                 return {id: new Date().getTime() + Math.random(), url: v, name: v.split('/').pop(), status: 'done'}
@@ -29,8 +48,15 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
         let currentChangeId = currentChangeIdRef.current
         currentChangeIdRef.current = -1
 
+        const filename = file.name
         if(maxFileSize && file.size > maxFileSize){
-            onFaild && onFaild(file.name + '超出限定大小')
+            onFaild && onFaild(`${filename}: 超出限定大小`)
+            return
+        }
+
+        const fileExt = file.name.split('.').pop() || ''
+        if(acceptType && !acceptType.includes(fileExt.toLocaleLowerCase())){
+            onFaild && onFaild(`${filename}: 格式不正确`)
             return
         }
 
@@ -59,12 +85,12 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
                 return
             }
             const {code, data: url, msg} = res
-            if(!code || code != 0){
+            if(code != 0){
                 onFaild && onFaild(msg)
                 removeFileType(id)
                 return
             }
-            modfiyFileType({...fileType, url, status: 'done'}) 
+            modfiyFileType({...fileType, url, status: 'done'})
         }
     })
 
@@ -136,7 +162,7 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
                 </div>
             }
             
-            <input type="file" className="hidden" id={name} onChange={(e: any) => {fileInputChange(e.target.files[0])}} />
+            <input type="file" accept={accept} className="hidden" id={name} onChange={(e: any) => {fileInputChange(e.target.files[0])}} />
         </div>
         : null
     )
@@ -144,6 +170,7 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
 
 export type FileUploadOption = {
     name: string,
+    acceptType?: string[]
     values?: string[]
     useDefaultView?: boolean
     type?: 'img' | 'file'

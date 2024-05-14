@@ -1,45 +1,43 @@
 import { useField } from "formik";
-import { FC, useEffect, useState } from "react";
-import ImageUploading, { ImageListType, ImageType } from 'react-images-uploading';
-import IconPlusCircle from './Icon/IconPlusCircle'
+import { FC,} from "react";
+import FileUpload, { FileType } from "./FileUpload";
+import { toast } from "./Toast";
 
 const ImgUpload: FC <{
-    className?: string,
-    name: string,
-}> = ({className, name}) => {
-    const [image, setImage] = useState<ImageType>();
+    name: string
+    maxFileCount: number
+    maxFileSize: number
+    width: string
+}> = ({name, maxFileCount, maxFileSize, width}) => {
     const [field, meta, helper] = useField({ name })
     const { value } = meta
-    const { setValue } = helper
+    const { setValue} = helper
 
-    const onChange = (imageList: ImageListType, addUpdateIndex : number[] | undefined) => {
-        setValue(imageList[0] ? imageList[0].file : undefined)
-        setImage(imageList[0])
-    };
+    const v = (!value || value.length == 0) ? [] : (maxFileCount == 1 ? [value] : value)
+
+    console.log(v);
+    
+
+    const onImgChange = (fileType: FileType[]) => {
+        setValue(maxFileCount == 1 ? fileType[0]?.url : fileType.map(v => v.url))
+    }
+
+    const onFaild = (msg: string) => {
+        toast(msg, 'warning')
+    }
 
     return (
-        <ImageUploading
-        value={[]}
-        maxFileSize={3 * 1024 * 1024} // 设置最大文件大小为3MB
-        onChange={onChange}
-        maxNumber={1}
-        dataURLKey="data_url"
-        acceptType={['png','jpg','jpeg']}
-        >
-        {({ onImageUpload, onImageUpdate }) => (
-            <div className={className}>
-                {image ? (
-                    <div>
-                        <img src={image['data_url']} onClick={() => onImageUpdate(0)} className={className} />
-                    </div>
-                ):(
-                    <div onClick={onImageUpload} className={`${className} w-20`}>
-                        <IconPlusCircle className={`${className} w-20`} />
-                    </div>
-                )}
-            </div>
-        )}
-        </ImageUploading>
+        <FileUpload
+        name={name}
+        values={v}
+        type="img"
+        width={width}
+        maxFileCount={maxFileCount}
+        maxFileSize={maxFileSize}
+        acceptType={['jpg', 'png', 'jpeg']}
+        onChange={fileType => onImgChange(fileType)}
+        onFaild={msg => onFaild(msg)}
+        />
     )
 }
 

@@ -1,11 +1,10 @@
 import { Field, Form, Formik, useField } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from 'yup'
-import { Goods, createGoodsApi, getGoodsDetailApi } from "../../../config/api/shop";
+import { Goods, createGoodsApi, getGoodsDetailApi, updateGoodsApi } from "../../../config/api/shop";
 import ImgUpload from "../../../components/ImgUpload";
-import FileUpload from "../../../components/FileUpload";
 
 
 const GoodsCompile = () => {
@@ -16,7 +15,7 @@ const GoodsCompile = () => {
 
     const [initialValues, setInitialValues] = useState<Goods>({
         title: '',
-        photo: undefined,
+        photo: '',
         subdescr: '',
         detail: '',
         oldPrice: 0,
@@ -25,16 +24,21 @@ const GoodsCompile = () => {
         classify: '',
     });
 
+    useEffect(() => {
+        loadInitData()
+    }, [])
+
+    const loadInitData = () => {
+        goodsId && getGoodsDetailApi(goodsId, setInitialValues)
+    }
+
     const required = t('required')
     const integer = t('integer')
     const min = t('min')
 
     const checkSchema = Yup.object().shape({
         title: Yup.string().required(required),
-        photo: Yup.mixed().required(required).test('fileSize', '最大1MB', (value) => {
-            if(!value) return true
-            return value.size <= 1024 * 1024 //1MB
-        }),
+        photo: Yup.string().required(required),
         subdescr: Yup.string().required(required),
         detail: Yup.string().required(required),
         oldPrice: Yup.number().nullable().required(required).integer(integer).min(1, `${min}1`),
@@ -48,7 +52,7 @@ const GoodsCompile = () => {
     }
 
     const saveGoods = (data: Goods) => {
-        createGoodsApi(data, gotoGoodsListPage)
+        goodsId ? updateGoodsApi(data, goodsId, gotoGoodsListPage) : createGoodsApi(data, gotoGoodsListPage)
     }
 
     return (
@@ -64,16 +68,6 @@ const GoodsCompile = () => {
                 <div className="flex xl:flex-row flex-col gap-2.5">
                     <div className="panel px-0 flex-1 py-6 ltr:xl:mr-6 rtl:xl:ml-6">
                         <div className="justify-between flex-wrap px-4">
-                            <FileUpload 
-                            name="myfiles" 
-                            type='img'
-                            values={['http://172.18.0.5:9000/vacan/1715047588395_wechat-tools-icon.png']}
-                            // width='w-[350px]'
-                            // imgView="h-20 w-20"
-                            maxFileCount={4}
-                            onFaild={(msg) => alert(msg)}
-                            onChange={(fileTypes) => {console.log(fileTypes)}}
-                            />
                             <div className="lg:w-1/2 w-full lg:max-w-fit py-2">
                                 <div className="flex items-center">
                                     <label htmlFor="title" className="flex-1 ltr:mr-2 rtl:ml-2 mb-0 w-20 text-right">
@@ -90,6 +84,15 @@ const GoodsCompile = () => {
                                     </label>
                                     <Field type="text" name="subdescr" className="form-input lg:w-[250px] w-2/3"/>
                                     {touched.subdescr && errors.subdescr ? <div className="text-danger mt-1">{errors.subdescr}</div> : null}
+                                </div>
+                            </div>
+                            <div className="lg:w-1/2 w-full lg:max-w-fit py-2">
+                                <div className="flex items-center">
+                                    <label htmlFor="photo" className="flex-1 ltr:mr-2 rtl:ml-2 mb-0 w-20 text-right">
+                                        图片
+                                    </label>
+                                    <ImgUpload name="photo" maxFileSize={1024*1024} maxFileCount={1} width="lg:w-[250px] w-2/3"/>
+                                    {touched.photo && errors.photo ? <div className="text-danger mt-1">{errors.photo}</div> : null}
                                 </div>
                             </div>
                             <div className="lg:w-1/2 w-full lg:max-w-fit py-2">
@@ -126,15 +129,6 @@ const GoodsCompile = () => {
                                     </label>
                                     <Field type="text" name="classify" className="form-input lg:w-[250px] w-2/3"/>
                                     {touched.classify && errors.classify ? <div className="text-danger mt-1">{errors.classify}</div> : null}
-                                </div>
-                            </div>
-                            <div className="lg:w-1/2 w-full lg:max-w-fit py-2">
-                                <div className="flex items-center">
-                                    <label htmlFor="photo" className="flex-1 ltr:mr-2 rtl:ml-2 mb-0 w-20 text-right">
-                                        图片
-                                    </label>
-                                    <ImgUpload name="photo" className="h-20"/>
-                                    {touched.photo && errors.photo ? <div className="text-danger mt-1">{errors.photo}</div> : null}
                                 </div>
                             </div>
                             <div className="lg:w-[600px] w-full lg:max-w-fit py-2">
