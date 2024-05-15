@@ -16,9 +16,9 @@ import IconArrowLeft from '../Icon/IconArrowLeft';
 import IconInfoCircle from '../Icon/IconInfoCircle';
 import IconBellBing from '../Icon/IconBellBing';
 import IconLogout from '../Icon/IconLogout';
-import { logoutapi } from '../../config/api/user';
 import { logout as rdxlogout } from '../../store/authStore';
 import IconUser from '../Icon/IconUser';
+import { gotoLogin } from '../../router/routes';
 
 const Header = () => {
     useEffect(() => {
@@ -31,13 +31,7 @@ const Header = () => {
     const dispatch = useDispatch();
     
     const logout = () => {
-        logoutapi(() => {
-            dispatch(rdxlogout())
-        })
-    }
-
-    const gotoLogin = () => {
-        navigate('/auth/login')
+        dispatch(rdxlogout())
     }
 
     function createMarkup(messages: any) {
@@ -205,7 +199,7 @@ const Header = () => {
                                 </ul>
                             </Dropdown>
                         </div>
-                        {authStore.jwt ? (
+                        {authStore.logined === '1' ? (
                         <div className="dropdown shrink-0">
                             <Dropdown
                                 offset={[0, 8]}
@@ -269,7 +263,7 @@ const Header = () => {
                                 </ul>
                             </Dropdown>
                         </div>) : ''}
-                        {authStore.jwt ? (
+                        {authStore.logined === '1' ? (
                         <div className="dropdown shrink-0">    
                             <Dropdown
                                 offset={[0, 8]}
@@ -345,7 +339,7 @@ const Header = () => {
                             </Dropdown>
                         </div>) : ''}
                         <div className="dropdown shrink-0 flex">
-                            {authStore.jwt ? (<Dropdown
+                            {authStore.logined === '1' ? (<Dropdown
                                 offset={[0, 8]}
                                 placement={`${isRtl ? 'bottom-start' : 'bottom-end'}`}
                                 btnClassName="relative group block"

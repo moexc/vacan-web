@@ -53,4 +53,8 @@ const routes = [
     {path: '*',element: <Error />,layout: 'blank'},
 ];
 
-export { routes };
+const gotoLogin = () => {
+    window.location.href='/auth/login'
+}
+
+export { routes, gotoLogin };

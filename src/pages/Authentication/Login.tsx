@@ -35,10 +35,12 @@ const LoginBoxed = () => {
         loginapi(formValue, (rst : any) =>{
             dispatch(rdxlogin({
                 logined: "1",
+                userid: rst.userId,
                 username: formValue.username,
-                userimg: rst.img,
+                userimg: rst.photo,
                 nickname: rst.nickName,
-                jwt: rst.token,
+                token: rst.token,
+                reftoken: rst.reftoken,
             }))
             navigate('/')
         })

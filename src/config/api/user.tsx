@@ -28,8 +28,8 @@ export type RegisterData = {
 export const registerapi = (data: RegisterData, fetched: Function) => request({url:'/api/auth/register', method: 'post', data, fetched})
 
 /**
- * 退出
+ * 刷新token
  * @param fetched callback
  * @returns 
  */
-export const logoutapi = (fetched: Function) => request({url:'/api/auth/logout', method:'post', fetched})
+export const flushTokenapi = (reftoken: string, fetched: Function) => request({url:`/api/auth/flushToken?reftoken=${reftoken}`, method:'post', fetched})

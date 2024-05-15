@@ -16,8 +16,8 @@ import IconArrowLeft from '../Icon/IconArrowLeft';
 import IconInfoCircle from '../Icon/IconInfoCircle';
 import IconBellBing from '../Icon/IconBellBing';
 import IconLogout from '../Icon/IconLogout';
-import { logoutapi } from '../../config/api/user';
 import { logout as rdxlogout } from '../../store/authStore';
+import { gotoLogin } from '../../router/routes';
 
 const Header = () => {
     const location = useLocation();
@@ -41,17 +41,14 @@ const Header = () => {
             }
         }
     }, [location]);
-    const navigate = useNavigate();
     const isRtl = false;
     const themeConfig = useSelector((state: IRootState) => state.themeConfigStore);
     const authStore = useSelector((state: IRootState) => state.authStore);
     const dispatch = useDispatch();
     
     const logout = () => {
-        logoutapi(() => {
-            dispatch(rdxlogout())
-            navigate('/auth/login')
-        })
+        dispatch(rdxlogout())
+        gotoLogin()
     }
 
     function createMarkup(messages: any) {

@@ -1,11 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
+    userid: null,
     logined: '0',
     username: null,
     userimg: '',
     nickname: null,
-    jwt: null,
+    token: null,
+    reftoken: null,
 };
 
 const authStore = createSlice({
@@ -14,23 +16,29 @@ const authStore = createSlice({
     reducers:{
         login(state, {payload}){
             payload = {...payload, userimg: payload.userimg || '/assets/images/profile-7.jpeg'} || state;
-            localStorage.setItem('token', payload.jwt)
+            state.userid = payload.userId;
             state.logined = payload.logined;
             state.username = payload.username;
             state.userimg = payload.userimg;
             state.nickname = payload.nickname;
-            state.jwt = payload.jwt;
+            state.token = payload.token;
+            state.reftoken = payload.reftoken;
         },
         logout(state){
-            localStorage.removeItem('token')
+            state.userid = initialState.userid;
             state.logined = initialState.logined;
             state.username = initialState.username;
             state.userimg = initialState.userimg;
             state.nickname = initialState.nickname;
-            state.jwt = initialState.jwt;
+            state.token = initialState.token;
+            state.reftoken = initialState.reftoken;
+        },
+        flushToken(state, {payload}){
+            state.token = payload.token
+            state.reftoken = payload.reftoken
         }
     }
 })
 
-export const {login, logout} = authStore.actions
+export const {login, logout, flushToken} = authStore.actions
 export default authStore.reducer
