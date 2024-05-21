@@ -20,7 +20,7 @@ import { logout as rdxlogout } from '../../store/authStore';
 import IconUser from '../Icon/IconUser';
 import { gotoLogin } from '../../router/routes';
 
-const Header = () => {
+const BlankHeader = () => {
     useEffect(() => {
 
     }, []);
@@ -384,4 +384,4 @@ const Header = () => {
     );
 };
 
-export default Header;
+export default BlankHeader;

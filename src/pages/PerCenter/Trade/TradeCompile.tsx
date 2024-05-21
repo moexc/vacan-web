@@ -95,6 +95,7 @@ const TradeComplie = () => {
                                     name='startTime'
                                     options={{
                                         minDate: new Date(),
+                                        enableTime: true
                                     }}
                                     className='lg:w-[250px] w-2/3'
                                     />

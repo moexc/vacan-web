@@ -37,7 +37,6 @@
     "count_down": "倒计时",
     "reset_cd": "出价延时",
     "add_bid": "添加标的",
-    "save": "保存",
 
     "sales": "销量",
     "price": "价格",
@@ -52,6 +51,15 @@
 
     "confirm": "确定",
     "cancel": "取消",
+    "save": "保存",
+    "edit": "修改",
+    "delete": "删除",
+    "add": "添加",
+    "update": "更新",
+
+    "shelve": "上架",
+    "off_shelf": "下架",
+    "push": "推送",
 
     "required": "必填",
     "integer": "整数",

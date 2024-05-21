@@ -14,6 +14,14 @@ export type Bid = {
     resetCd: number,
 }
 
+export type SearchCondit = {
+    tradeName: string
+    timeRangeBefore: string,
+    timeRangeAfter: string,
+    tradeStatus: string,
+    sendStatus: string
+}
+
 /**
  * 获取专场列表
  * @param searchCondit 查询条件
@@ -22,7 +30,7 @@ export type Bid = {
  * @param fetched callback
  * @returns 
  */
-export const getTradesApi = (searchCondit: any, page: number, rows: number, fetched: Function) => request({
+export const getTradesApi = (searchCondit: SearchCondit, page: number, rows: number, fetched: Function) => request({
     url:'/api/trade/search', method:'post', data: searchCondit, params:{page, rows}, fetched
 })
 
@@ -64,7 +72,7 @@ export const deleteTradeApi = (tradeId: string, fetched : Function) => request({
  * @param tradeId 专场ID
  * @returns 
  */
-export const sendEngine = (tradeId: string) => request({url:`/api/trade/${tradeId}`, method:'put', params:{'operation': 'Send2Engine'}})
+export const sendEngine = (tradeId: string, fetched: Function) => request({url:`/api/trade/${tradeId}`, method:'patch', params:{'operation': 'Send2Engine'}, fetched})
 
 /**
  * 获取已发布专场（已推送 && 未结束）

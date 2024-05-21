@@ -2,7 +2,7 @@ import Flatpickr from 'react-flatpickr';
 import 'flatpickr/dist/flatpickr.css';
 import { FC } from 'react';
 import { useField } from 'formik';
-import { parseDate } from '../util/time';
+import { parseDate, parseDay } from '../util/time';
 
 const DateInput: FC<{
     options ?: {
@@ -10,25 +10,27 @@ const DateInput: FC<{
         dateFormat?: string,
         minDate?: Date,
     },
+    range?: boolean,
     className?: string,
     name: string,
-}> = ({options, className, name}) => {
+}> = ({options, range=false, className, name}) => {
 
     const [field, meta, helper] = useField({ name })
     const { value } = meta
     const { setValue } = helper
 
     const handChange = (date : Date[]) => {
-        setValue(date.length > 0 ? parseDate(date[0]) : '')
+        setValue(date.map(item => (options?.enableTime ? parseDate(item) : parseDay(item))).join(','))
     }
 
     return (
         <Flatpickr
         name={name}
         data-enable-time
-        value={value}
+        value={range ? undefined : value}
         options={{
             ...options,
+            mode: range ? 'range' : 'single',
             locale: {
                 weekdays: {
                     shorthand: ["日", "一", "二", "三", "四", "五", "六"],

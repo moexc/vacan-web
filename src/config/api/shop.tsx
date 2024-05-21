@@ -55,6 +55,17 @@ export const getGoodsDetailApi = (id: string, fetched: Function) => request({
 })
 
 /**
+ * 修改状态
+ * @param id 商品ID
+ * @param status 03-上架 04-下架 05-删除
+ * @param fetched callback
+ * @returns 
+ */
+export const updateStatusApi = (id: string, status: string, fetched: Function) => request({
+    url: `/api/goods/${id}`, method:'patch', params: {status}, fetched
+})
+
+/**
  * 推荐商品
  * @param fetched callback
  * @returns 

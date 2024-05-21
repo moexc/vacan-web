@@ -1,7 +1,7 @@
 // 封装请求
 import axios from 'axios'
 import { confirm, toast } from '../components/Toast'
-import {store} from '../main'
+import store from '../store'
 import { gotoLogin as gotoLoginPage } from '../router/routes'
 import { flushToken, logout } from '../store/authStore'
 import { flushTokenapi } from './api/user'
@@ -112,7 +112,7 @@ function gotoLogin(title: string, content: string){
 
 type ReCfg = {
     url: string;
-    method?: 'get' | 'post' | 'put' | 'delete';
+    method?: 'get' | 'post' | 'put' | 'delete' | 'patch';
     params?: any;
     data?: any;
     fetched?: Function;

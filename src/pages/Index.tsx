@@ -3,7 +3,6 @@ import { Suspense, useEffect, useState } from 'react';
 import { setPageTitle } from '../store/themeConfigStore';
 import { useDispatch } from 'react-redux';
 import IconBox from '../components/Icon/IconBox';
-import BlankHeader from '../components/Layouts/BlankHeader'
 import { useTranslation } from 'react-i18next';
 import IconStar from '../components/Icon/IconStar';
 import IconClipboardText from '../components/Icon/IconClipboardText';
@@ -37,7 +36,6 @@ const Index = () => {
 
     return (
         <div>
-            <BlankHeader />
             <div className="relative rounded-t-md bg-primary-light bg-[url('/assets/images/knowledge/pattern.png')] bg-contain bg-left-top bg-no-repeat px-5 py-10 dark:bg-black md:px-10">
                 <div className="relative">
                     <form action="" method="" className="mb-3">
@@ -109,13 +107,11 @@ const Index = () => {
                 </ul>
             </div>
 
-            <div className='mx-60 min-h-[400px]'>
+            <div className='px-60'>
                 <Suspense>
                     <Outlet/>
                 </Suspense>
             </div>
-
-            <div className="text-center dark:text-white-dark my-5">© {new Date().getFullYear()}. Vristo All rights reserved.</div>
         </div>
     );
 };

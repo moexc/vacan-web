@@ -24,7 +24,7 @@ const Suggest = () => {
                                 <img src={item.photo} alt="..." className="w-full object-cover" />
                             </div>
                             <div>
-                                <p className="text-base font-semibold dark:text-white">{item.title}</p>
+                                <p className="text-base font-semibold dark:text-white min-h-[50px]">{item.title}</p>
                                 <p className="dark:text-white mt-2">{item.subdescr}</p>
                                 <p className="dark:text-white mt-4">
                                     <span className='float-left'>{t('sales')} {item.quantity}</span>

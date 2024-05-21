@@ -96,7 +96,7 @@ const DefaultLayout = ({ children }: PropsWithChildren<{children: ReactNode}>) =
                         {/* END CONTENT AREA */}
 
                         {/* BEGIN FOOTER */}
-                        <Footer />
+                        <Footer align='left'/>
                         {/* END FOOTER */}
                         <Portals />
                     </div>

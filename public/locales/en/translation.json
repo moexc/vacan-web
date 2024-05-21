@@ -37,7 +37,6 @@
     "count_down": "Count Down",
     "reset_cd": "Reset Cd",
     "add_bid": "Add Bid",
-    "save": "Save",
 
     "sales": "Sales",
     "price": "Price",
@@ -52,6 +51,15 @@
 
     "confirm": "Confirm",
     "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "update": "Update",
+
+    "shelve": "Shelve",
+    "off_shelf": "OffShelf",
+    "push": "Push",
 
     "required": "required",
     "integer": "integer",

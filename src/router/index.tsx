@@ -8,7 +8,10 @@ const finalRoutes = routes.map((route) => {
     return {
         ...route,
         element: <AuthCheck auth={route.auth} path={route.path}>
-            {route.layout === 'blank' ? <BlankLayout>{route.element}</BlankLayout> : <DefaultLayout>{route.element}</DefaultLayout>}
+            {route.layout === 'blank' ? 
+                <BlankLayout header={route.header}>{route.element}</BlankLayout> : 
+                <DefaultLayout>{route.element}</DefaultLayout>
+            }
         </AuthCheck>,
     };
 });

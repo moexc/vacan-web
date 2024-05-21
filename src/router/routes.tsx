@@ -10,6 +10,8 @@ const AuctionMart = lazy(() => import('../pages/Index/AuctionMart'))
 const Report = lazy(() => import('../pages/Index/Report'))
 const Contact = lazy(() => import('../pages/Index/Contact'))
 
+const Bidding = lazy(() => import('../pages/Bidding'))
+
 const Home = lazy(() => import('../pages/PerCenter/Home'));
 const TradeList = lazy(() => import('../pages/PerCenter/Trade/TradeList'));
 const TradeCompile = lazy(() => import('../pages/PerCenter/Trade/TradeCompile'));
@@ -34,6 +36,7 @@ const routes = [
             {index: true, element: <Suggest/>},
         ]
     },
+    {path: '/bid', element: <Bidding />, layout: 'blank'},
     // 个人中心
     {path: '/home', element: <Home />},
     {path: '/trade', element: <TradeList />},
@@ -42,15 +45,16 @@ const routes = [
     {path: '/goods', element: <GoodsList />},
     {path: '/goods/add', element: <GoodsCompile />},
     {path: '/goods/edit', element: <GoodsCompile />},
+    
     // 登录、注册
-    {path: '/auth/login',element: <Login />,layout: 'blank',auth: false},
-    {path: '/auth/register',element: <Register />,layout: 'blank',auth: false},
+    {path: '/auth/login',element: <Login />,layout: 'blank',auth: false, header: false},
+    {path: '/auth/register',element: <Register />,layout: 'blank',auth: false, header: false},
     {path: '/auth/password-reset',element: <RecoverIdBoxed />,layout: 'blank'},
     //error
     {path: '/pages/error404',element: <ERROR404 />,layout: 'blank'},
     {path: '/pages/error500',element: <ERROR500 />,layout: 'blank'},
     {path: '/pages/error503',element: <ERROR503 />,layout: 'blank'},
-    {path: '*',element: <Error />,layout: 'blank'},
+    {path: '*',element: <ERROR404 />,layout: 'blank'},
 ];
 
 const gotoLogin = () => {

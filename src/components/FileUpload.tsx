@@ -28,7 +28,7 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
     useEffect(() => {
         setAccept(
             acceptType?.map(v => {
-                return typeDefine[v]
+                return typeDefine.get(v)
             }).join(',') || ''
         )
     }, [])

@@ -19,6 +19,7 @@ export const parseDate = (date: Date, dateSplit = '-', timeSplit=':') => {
  * 时间戳转为格式化日期
  */
 export const parse = (timestamp: number, dateSplit = '-', timeSplit=':') => {
+    if(!timestamp) return ''
     const date = new Date(timestamp)
     return parseDate(date, dateSplit, timeSplit)
 }

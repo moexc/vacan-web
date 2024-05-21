@@ -2,9 +2,11 @@ import { useEffect, useState } from "react"
 import { getPushedApi } from "../../config/api/trade"
 import {parse} from '../../util/time'
 import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
 
 const AuctionMart = () => {
     const {t} = useTranslation()
+    const navigate = useNavigate()
     const [trades, setTrades] = useState([])
     useEffect(() => {
         loadTrades()
@@ -14,12 +16,16 @@ const AuctionMart = () => {
         getPushedApi(setTrades)
     }
 
+    const gotoBiddingPage = (tradeId: string) => {
+        navigate('/bid', {state: {tradeId}})
+    }
+
     return(
         <div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-5">
                 {trades.map((trade: any) => {
                     return (
-                        <div key={trade.id} className={`space-y-5 rounded-md border border-white-light bg-white p-5 shadow-[0px_0px_2px_0px_rgba(145,158,171,0.20),0px_12px_24px_-4px_rgba(145,158,171,0.12)] dark:border-[#1B2E4B] dark:bg-black`}>
+                        <div key={trade.id} onClick={() => gotoBiddingPage(trade.id)} className={`space-y-5 rounded-md border border-white-light bg-white p-5 shadow-[0px_0px_2px_0px_rgba(145,158,171,0.20),0px_12px_24px_-4px_rgba(145,158,171,0.12)] dark:border-[#1B2E4B] dark:bg-black`}>
                             <div className="h-56 overflow-hidden rounded-md">
                                 <img src='/assets/images/profile-5.jpeg' alt="..." className="w-full object-cover" />
                             </div>

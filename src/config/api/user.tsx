@@ -32,4 +32,4 @@ export const registerapi = (data: RegisterData, fetched: Function) => request({u
  * @param fetched callback
  * @returns 
  */
-export const flushTokenapi = (reftoken: string, fetched: Function) => request({url:`/api/auth/flushToken?reftoken=${reftoken}`, method:'post', fetched})
+export const flushTokenapi = (reftoken: string, fetched: Function) => request({url:'/api/auth/flushToken', method:'post', params:{reftoken}, fetched})
