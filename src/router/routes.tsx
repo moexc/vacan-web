@@ -25,6 +25,8 @@ const ERROR500 = lazy(() => import('../pages/Pages/Error500'));
 const ERROR503 = lazy(() => import('../pages/Pages/Error503'));
 const Error = lazy(() => import('../pages/Pages/Error'));
 
+const TestChange = lazy(() => import('../pages/TestChange'))
+
 const routes = [
     {path: '/', element: <Index />, layout: 'blank', auth: false, 
         children: [
@@ -33,10 +35,12 @@ const routes = [
             {path: '/auction_mart', element: <AuctionMart/>},
             {path: '/report', element: <Report/>},
             {path: '/contact', element: <Contact/>},
+            
             {index: true, element: <Suggest/>},
         ]
     },
     {path: '/bid', element: <Bidding />, layout: 'blank'},
+    {path: '/change', element: <TestChange />, layout: 'blank'},
     // 个人中心
     {path: '/home', element: <Home />},
     {path: '/trade', element: <TradeList />},

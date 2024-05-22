@@ -33,7 +33,15 @@ const AuctionMart = () => {
                                 <p className="text-base font-semibold dark:text-white">{trade.name}</p>
                                 <p className="dark:text-white mt-2">{t('start_time')} : <span className="text-red-500">{parse(trade.startTime)}</span></p>
                                 <p className="dark:text-white mt-2">
-                                    <span className='float-left'>{t('status')} : <span className={`font-semibold ${trade.status === '运行中' ? 'text-primary' : ''}`}>{trade.status}</span></span>
+                                    <span className='float-left'>
+                                        {t('status')} : <span className={`font-semibold ${trade.status === '1' ? 'text-primary' : ''}`}>
+                                            {
+                                            trade.status === '0' ? '未启动' 
+                                            : trade.status === '1' ? '运行中'
+                                            : ''
+                                            }
+                                        </span>
+                                    </span>
                                     <span className='float-right'>{t('bid_count')} : <span className="font-semibold text-primary">{trade.bidCount}</span></span>
                                 </p>
                             </div>

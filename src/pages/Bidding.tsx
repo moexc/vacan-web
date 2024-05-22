@@ -1,11 +1,14 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../store";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import sio, {Socket} from 'socket.io-client'
-import { parse, parseDate } from "../util/time";
-import { CellStatus } from "../components/DataTableCell";
+import { parse } from "../util/time";
 import { toMoney } from "../util/number";
+import TimeCountDown from "../components/TimeCountDown";
+import { flushTokenapi } from "../config/api/user";
+import { gotoLogin } from "../router/routes";
+import { flushToken, logout } from "../store/authStore";
 
 type Trade = {
     id: string
@@ -32,85 +35,42 @@ type Bid = {
 
 const Bidding = () => {
     const location = useLocation()
+    const dispatch = useDispatch();
     const tradeId = location.state?.tradeId
     const authStore = useSelector((state: IRootState) => state.authStore);
-    const token = authStore.token
+    let token = authStore.token || ''
+    const reftoken = authStore.reftoken || ''
     const [socket, setSocket] = useState<Socket>()
-
     const [trade, setTrade] = useState<Trade>()
 
     useEffect(() => {
-        const socketIns = sio(`ws://localhost:9527?tradeId=${tradeId}&token=${token}`, )
+        let socketIns = sio(`ws://localhost:9527?tradeId=${tradeId}&token=${token}`)
         socketIns.on('TradeInfo', (msg)=>{
             setTrade(msg)
         })
         socketIns.on('Bided', (msg) => {
             console.log("Bided", msg);
         })
-
-        setSocket(socketIns)
+        socketIns.on('tokenTimeout', async () => {
+            let newtoken = '', newreftoken
+            await flushTokenapi(reftoken, (res: any)=>{
+                newtoken = res?.token
+                newreftoken = res?.refToken
+            })
+            if(!newtoken || !newreftoken){
+                dispatch(logout())
+                gotoLogin()
+                return;
+            }
+            dispatch(flushToken({'token': newtoken, 'reftoken': newreftoken}))
+            token = newtoken
+            socketIns = sio(`ws://localhost:9527?tradeId=${tradeId}&token=${token}`)
+        })
 
         return(() => {
             socketIns.disconnect()
         })
     }, [])
-
-
-    const items = [
-        {
-            id: 1,
-            title: 'Calendar App Customization',
-            quantity: 1,
-            price: '120',
-            amount: '120',
-        },
-        {
-            id: 2,
-            title: 'Chat App Customization',
-            quantity: 1,
-            price: '230',
-            amount: '230',
-        },
-        {
-            id: 3,
-            title: 'Laravel Integration',
-            quantity: 1,
-            price: '405',
-            amount: '405',
-        },
-        {
-            id: 4,
-            title: 'Backend UI Design',
-            quantity: 1,
-            price: '2500',
-            amount: '2500',
-        },
-    ];
-
-    const columns = [
-        {
-            key: 'id',
-            label: 'S.NO',
-        },
-        {
-            key: 'title',
-            label: 'ITEMS',
-        },
-        {
-            key: 'quantity',
-            label: 'QTY',
-        },
-        {
-            key: 'price',
-            label: 'PRICE',
-            class: 'ltr:text-right rtl:text-left',
-        },
-        {
-            key: 'amount',
-            label: 'AMOUNT',
-            class: 'ltr:text-right rtl:text-left',
-        },
-    ];
 
     const showBid = (bid: Bid) => {
         return (
@@ -144,6 +104,18 @@ const Bidding = () => {
                         <div className="text-white-dark w-24">当前报价:</div>
                         <div className="">{bid.price ? toMoney(bid.price) : '暂无'}</div>
                     </div>
+                    <div className="flex">
+                        <div className="text-white-dark w-24">倒计时:</div>
+                        <div className="">
+                            <TimeCountDown overTime={bid.endTIme} />
+                        </div>
+                    </div>
+                    <div className="col-start-2 col-end-6 flex">
+                        <div className="text-white-dark w-24">报价:</div>
+                        <div className="">
+                            <input/>
+                        </div>
+                    </div>
                 </div>
             </>
         )
@@ -173,13 +145,13 @@ const Bidding = () => {
                         <div className="text-2xl font-semibold uppercase flex items-center gap-2">
                             {trade.name}
                             {statusBadge(trade.status, true)}
-                            <span className="text-gray-400">(第{trade.bidIndex + 1}节)</span>
+                            <span className="text-gray-400">({trade.bidIndex === -1 ? parse(trade.startTime) : `第${trade.bidIndex + 1}节`})</span>
                         </div>
                     </div>
 
                     <hr className="border-white-light dark:border-[#1b2e4b] my-6" />
-                    <div className="flex justify-between lg:flex-row flex-col gap-6 flex-wrap">
-                        {trade.bidIndex !== -1 && showBid(trade.bids[trade.bidIndex])}
+                    <div className="flex justify-between lg:flex-row flex-col gap-6 flex-wrap min-h-[200px]">
+                        {trade.bidIndex !== -1 ? showBid(trade.bids[trade.bidIndex]) : <div className="flex-1 pt-[50px] text-center text-lg text-warning font-semibold">未开始</div>}
                     </div>
                     <div className="table-responsive mt-6">
                         <table className="table-striped">
@@ -202,7 +174,7 @@ const Bidding = () => {
                                             <td>{index + 1}</td>
                                             <td>{item.name}</td>
                                             <td>{parse(item.startTime)}</td>
-                                            <td>{parse(item.endTIme)}</td>
+                                            <td>{item.status === '已结束' && parse(item.endTIme)}</td>
                                             <td className="text-right">{toMoney(item.startPrice)}</td>
                                             <td className="text-right">{toMoney(item.price)}</td>
                                             <td>{item.status}</td>
