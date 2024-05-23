@@ -8,13 +8,15 @@ import IconShelve from './Icon/IconShelve';
 import IconOffShelf from './Icon/IconOffShelf';
 import IconPush from './Icon/IconPush';
 import IconCaretDown from './Icon/IconCaretDown';
+import IconXCircle from './Icon/IconXCircle';
+import IconRefresh from './Icon/IconRefresh';
 
 
 
 const IconBtn = ({children, title, className, onClick}: PropsWithChildren<IconBtnProp>) => {
     return (
         <Tippy content={title}>
-            <button type="button" className={className} onClick={onClick}>
+            <button type="button" className={className} onClick={(e) => {e.stopPropagation(); onClick()}}>
                 {children}
             </button>
         </Tippy>
@@ -57,6 +59,16 @@ const ExpandIconBtn = (prop: OperSwitchProp) => {
     return <IconBtn className={`${className} ${expand && 'rotate-180'}`} title={expand ? t('折叠') : t('展开')} onClick={onclick} > <IconCaretDown className='w-6 h-6'/> </IconBtn>
 }
 
+const XCircleIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
+    const {t} =  useTranslation()
+    return <IconBtn {...prop} title={t('delete')}> <IconXCircle/> </IconBtn>
+}
+
+const RefreshIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
+    const {t} =  useTranslation()
+    return <IconBtn {...prop} title={t('refresh')}> <IconRefresh/> </IconBtn>
+}
+
 type OperSwitchProp = {
     onClick: () => void
     className?: string
@@ -74,4 +86,4 @@ type IconBtnProp = {
     className?: string
 }
 
-export{EditIconBtn, DeleteIconBtn, ShelveIconBtn, OffShelfIconBtn, PushIconBtn, ExpandIconBtn}
+export{EditIconBtn, DeleteIconBtn, ShelveIconBtn, OffShelfIconBtn, PushIconBtn, ExpandIconBtn, XCircleIconBtn, RefreshIconBtn}

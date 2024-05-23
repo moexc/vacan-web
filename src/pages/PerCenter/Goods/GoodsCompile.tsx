@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from 'yup'
 import { Goods, createGoodsApi, getGoodsDetailApi, updateGoodsApi } from "../../../config/api/shop";
 import ImgUpload from "../../../components/ImgUpload";
+import Loading from "../../../components/Loading";
 
 
 const GoodsCompile = () => {
@@ -12,6 +13,7 @@ const GoodsCompile = () => {
     const navigate = useNavigate()
     const location = useLocation()
     const goodsId = location.state && location.state.goodsId
+    const [loaded, setLoaded] = useState(false)
 
     const [initialValues, setInitialValues] = useState<Goods>({
         title: '',
@@ -29,7 +31,11 @@ const GoodsCompile = () => {
     }, [])
 
     const loadInitData = () => {
-        goodsId && getGoodsDetailApi(goodsId, setInitialValues)
+        if(!goodsId) setLoaded(true)
+        else getGoodsDetailApi(goodsId, (data: any) => {
+            setInitialValues(data)
+            setLoaded(true)
+        })
     }
 
     const required = t('required')
@@ -56,6 +62,7 @@ const GoodsCompile = () => {
     }
 
     return (
+        !loaded ? <Loading height={600}/> :
         <Formik
         enableReinitialize
         initialValues={initialValues}

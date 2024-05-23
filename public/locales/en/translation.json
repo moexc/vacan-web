@@ -60,6 +60,7 @@
     "shelve": "Shelve",
     "off_shelf": "OffShelf",
     "push": "Push",
+    "refresh": "Refresh",
 
     "required": "required",
     "integer": "integer",

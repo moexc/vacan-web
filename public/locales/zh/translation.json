@@ -60,6 +60,7 @@
     "shelve": "上架",
     "off_shelf": "下架",
     "push": "推送",
+    "refresh": "重试",
 
     "required": "必填",
     "integer": "整数",

@@ -11,6 +11,14 @@ export type Goods = {
     classify: string,
 }
 
+export type SearchCondit = {
+    tradeName: string
+    timeRangeBefore: string,
+    timeRangeAfter: string,
+    tradeStatus: string,
+    sendStatus: string
+}
+
 /**
  * 获取商品列表
  * @param searchCondit 查询条件
@@ -19,7 +27,7 @@ export type Goods = {
  * @param fetched callback
  * @returns 
  */
-export const getGoodsApi = (searchCondit: any, page: number, rows: number, fetched: Function) => request({
+export const getGoodsApi = (searchCondit: SearchCondit, page: number, rows: number, fetched: Function) => request({
     url:'/api/goods/search', method:'post', data: searchCondit, params:{page, rows}, fetched
 })
 

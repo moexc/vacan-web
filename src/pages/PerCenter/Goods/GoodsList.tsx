@@ -4,13 +4,44 @@ import { useDispatch } from 'react-redux';
 import { setPageTitle } from '../../../store/themeConfigStore';
 import { useTranslation } from 'react-i18next';
 
-import { getGoodsApi, updateStatusApi } from '../../../config/api/shop';
+import { SearchCondit, getGoodsApi, updateStatusApi } from '../../../config/api/shop';
 import { useNavigate } from 'react-router-dom';
 import { simpleCfm } from '../../../components/Toast';
 import { Cell, CellMoney, CellNumber, CellStatus, CellTime } from '../../../components/DataTableCell';
 import { DeleteIconBtn, EditIconBtn, OffShelfIconBtn, ShelveIconBtn } from '../../../components/IconBtn';
+import { Field, Form, Formik } from 'formik';
+import DateInput from '../../../components/DateInput';
+
+type SearchForm = {
+    tradeName: string
+    timeRange: string
+    tradeStatus: string
+    sendStatus: string
+}
+
+const statusArr = [
+    {code: '00', name: '待审核', cell: <CellStatus badge='info'>待审核</CellStatus>},
+    {code: '01', name: '审核不通过', cell: <CellStatus badge='danger'>审核不通过</CellStatus>},
+    {code: '02', name: '审核通过', cell: <CellStatus badge='primary'>审核通过</CellStatus>},
+    {code: '03', name: '已上架', cell: <CellStatus badge='success'>已上架</CellStatus>},
+    {code: '04', name: '已下架', cell: <CellStatus badge='warning'>已下架</CellStatus>},
+]
+
 
 const Goods = () => {
+    const initialValues: SearchForm = {
+        tradeName: '',
+        timeRange: '',
+        tradeStatus: '',
+        sendStatus: ''
+    }
+    const initSearchCondit: SearchCondit = {
+        tradeName: '',
+        timeRangeBefore: '',
+        timeRangeAfter: '',
+        tradeStatus: '',
+        sendStatus: ''
+    }
     const {t} = useTranslation()
     const navigate = useNavigate()
     const dispatch = useDispatch();
@@ -23,10 +54,11 @@ const Goods = () => {
     const [totalRecord, setTotalRecord] = useState(0);
     const [recordsData, setRecordsData] = useState([]);
     const [fetching, setFetching] = useState(false)
+    const [searchCondit, setSearchCondit] = useState(initSearchCondit)
 
     useEffect(() => {
         reqGoods()
-    }, [page, pageSize]);
+    }, [page, pageSize, searchCondit]);
 
     function reqGoods(){
         setFetching(true)
@@ -67,14 +99,6 @@ const Goods = () => {
     const ModfiyBtn: FC<{id: string}> = ({id}) => <EditIconBtn onClick={() => editGoods(id)}/>
     const DeleteBtn: FC<{id: string}> = ({id}) => <DeleteIconBtn onClick={()=> deleteGoods(id)}/>
 
-    const statusChildren = (status: string) => {
-        if (status === '00') return <CellStatus badge='info'>待审核</CellStatus>
-        else if (status === '01') return <CellStatus badge='danger'>审核不通过</CellStatus>
-        else if (status === '02') return <CellStatus badge='primary'>审核通过</CellStatus>
-        else if (status === '03') return <CellStatus badge='success'>已上架</CellStatus>
-        else if (status === '04') return <CellStatus badge='warning'>已下架</CellStatus>
-    }
-
     const autionChildren = (status: string, id: string) => {
         if (status === '00') return <Cell align='left'><UpBtn id={id} /><ModfiyBtn id={id} /><DeleteBtn id={id} /></Cell>
         else if (status === '01') return <Cell align='left'><ModfiyBtn id={id} /><DeleteBtn id={id} /></Cell>
@@ -83,15 +107,75 @@ const Goods = () => {
         else if (status === '04') return <Cell align='left'><UpBtn id={id} /><ModfiyBtn id={id} /><DeleteBtn id={id} /></Cell>
     }
 
+    const onChangeSearchCondit = (data: SearchForm) => {
+        let timeRangeBefore = '', timeRangeAfter = ''
+        if(data.timeRange){
+            const timeRangeArr = data.timeRange.split(',')
+            timeRangeBefore = timeRangeArr[0] + ' 00:00:00'
+            timeRangeAfter = timeRangeArr[1] + ' 23:59:59'
+        }
+        setSearchCondit({...data, timeRangeBefore, timeRangeAfter})
+    }
+
     return(
         <div>
             <div className="panel">
                 <div className="mb-4.5 flex md:items-center md:flex-row flex-col gap-5">
                 <h5 className="font-semibold text-lg dark:text-white-light">商品列表</h5>
                     <div className="ltr:ml-auto rtl:mr-auto">
-                        <button type="button" className="btn btn-primary" onClick={toGoodsAddPage}>添加</button>
+                        <button type="button" className="btn btn-primary" onClick={toGoodsAddPage}>{t('add')}</button>
                     </div>
                 </div>
+
+                <Formik
+                initialValues={initialValues}
+                onSubmit={ (data) => onChangeSearchCondit(data) }
+                >
+                {() => (
+                    <Form>
+                        <div className="border border-[#d3d3d3] rounded dark:border-[#1b2e4b] mb-4">
+                            <div className={`p-4 w-full flex items-center`}>
+                                <div className="w-full grid grid-cols-5 gap-6">
+                                    <div className="flex flex-row items-center">
+                                        <label htmlFor="tradeName">专场名称:</label>
+                                        <Field id="tradeName" name='tradeName' type="text" className="form-input flex-1 ml-2" />
+                                    </div>
+                                    <div className="flex flex-row flex-grow items-center">
+                                        <label htmlFor="tradeStatus">创建日期:</label>
+                                        <DateInput 
+                                        name='timeRange'
+                                        range={true}
+                                        options={{
+                                            enableTime: false,
+                                        }}
+                                        className="flex-1 ml-2"
+                                        />
+                                    </div>
+                                    <div className="flex flex-row flex-grow items-center">
+                                        <label htmlFor="tradeStatus">状态:</label>
+                                        <Field as='select' id="tradeStatus" name='tradeStatus' className="form-select flex-1 ml-2">
+                                            <option value=''></option>
+                                            {statusArr.map(item => {
+                                                return <option key={item.code} value={item.code}>{item.name}</option>
+                                            })}
+                                        </Field>
+                                    </div>
+                                    <div className="flex flex-row flex-grow items-center">
+                                        
+                                    </div>
+                                    <div className="flex flex-row flex-grow items-center">
+                                        <button type="submit" className="btn btn-primary">
+                                            {t('search')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Form>
+                )}
+                
+                </Formik>
+
                 <div className="datatables">
                     <DataTable
                     noRecordsText="无数据"
@@ -106,7 +190,7 @@ const Goods = () => {
                     { accessor: 'price', width:120, title: '单价', textAlignment: 'right', render: ({price}) => <CellMoney>{price}</CellMoney>},
                     { accessor: 'quantity', width:120, title: '库存', textAlignment: 'right', render: ({quantity}) => <CellNumber fixed={0}>{quantity}</CellNumber>},
                     { accessor: 'createTime', width: 180, title: '创建时间', textAlignment: 'center', render: ({createTime}) => <CellTime>{createTime}</CellTime>},
-                    { accessor: 'status', width:120, title: '状态', textAlignment: 'center', render: ({status}) => statusChildren(status)},
+                    { accessor: 'status', width:120, title: '状态', textAlignment: 'center', render: ({status}) => statusArr.filter(item => item.code === status)[0].cell},
                     { accessor: 'aution', width: 120, title: '操作', render: ({ status, id }) => autionChildren(status, id)},
                     ]}
                     idAccessor="id"

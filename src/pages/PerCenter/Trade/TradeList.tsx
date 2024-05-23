@@ -177,9 +177,9 @@ const Trade = () => {
                                     </div>
                                     <div className="flex flex-row flex-grow items-center">
                                         <button type="submit" className="btn btn-primary">
-                                            Submit
+                                            {t('search')}
                                         </button>
-                                        <ExpandIconBtn className='ltr:ml-auto rtl:mr-auto' onClick={() => setSearchViewOpen(!searchViewOpen)} />
+                                        <ExpandIconBtn className='ml-auto' onClick={() => setSearchViewOpen(!searchViewOpen)} />
                                     </div>
                                 </div>
                             </div>

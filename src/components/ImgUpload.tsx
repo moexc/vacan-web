@@ -1,7 +1,6 @@
 import { useField } from "formik";
 import { FC,} from "react";
-import FileUpload, { FileType } from "./FileUpload";
-import { toast } from "./Toast";
+import FileUpload, { Document } from "./FileUpload";
 
 const ImgUpload: FC <{
     name: string
@@ -11,15 +10,10 @@ const ImgUpload: FC <{
 }> = ({name, maxFileCount, maxFileSize, width}) => {
     const [field, meta, helper] = useField({ name })
     const { value } = meta
-    const { setValue, setTouched } = helper
-
-    const onImgChange = (fileType: FileType[]) => {
-        setValue(maxFileCount == 1 ? fileType[0]?.url : fileType.map(v => v.url))
-    }
-
-    const onFaild = (msg: string) => {
-        toast(msg, 'warning')
-        setTouched(true)
+    const { setValue } = helper
+    
+    const onImgChange = (docs: Document[]) => {
+        setValue(maxFileCount == 1 ? docs[0]?.url : docs.map(v => v.url))
     }
 
     return (
@@ -31,8 +25,7 @@ const ImgUpload: FC <{
         maxFileCount={maxFileCount}
         maxFileSize={maxFileSize}
         acceptType={['jpg', 'png', 'jpeg']}
-        onChange={fileType => onImgChange(fileType)}
-        onFaild={msg => onFaild(msg)}
+        onChange={docs => onImgChange(docs)}
         />
     )
 }
