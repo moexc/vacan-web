@@ -48,6 +48,10 @@
 @tailwind utilities;
 
 @layer components {
+    .search-label{
+        @apply w-16 text-right;
+    }
+
     html {
         @apply scroll-smooth;
     }

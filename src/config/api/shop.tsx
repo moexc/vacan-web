@@ -12,11 +12,10 @@ export type Goods = {
 }
 
 export type SearchCondit = {
-    tradeName: string
-    timeRangeBefore: string,
-    timeRangeAfter: string,
-    tradeStatus: string,
-    sendStatus: string
+    name: string
+    timeRangeBefore: string
+    timeRangeAfter: string
+    status: string
 }
 
 /**

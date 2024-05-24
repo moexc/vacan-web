@@ -13,10 +13,9 @@ import { Field, Form, Formik } from 'formik';
 import DateInput from '../../../components/DateInput';
 
 type SearchForm = {
-    tradeName: string
+    name: string
     timeRange: string
-    tradeStatus: string
-    sendStatus: string
+    status: string
 }
 
 const statusArr = [
@@ -30,17 +29,15 @@ const statusArr = [
 
 const Goods = () => {
     const initialValues: SearchForm = {
-        tradeName: '',
+        name: '',
         timeRange: '',
-        tradeStatus: '',
-        sendStatus: ''
+        status: ''
     }
     const initSearchCondit: SearchCondit = {
-        tradeName: '',
+        name: '',
         timeRangeBefore: '',
         timeRangeAfter: '',
-        tradeStatus: '',
-        sendStatus: ''
+        status: '',
     }
     const {t} = useTranslation()
     const navigate = useNavigate()
@@ -62,7 +59,7 @@ const Goods = () => {
 
     function reqGoods(){
         setFetching(true)
-        getGoodsApi({}, page, pageSize, (data: any) => {
+        getGoodsApi(searchCondit, page, pageSize, (data: any) => {
             setTotalRecord(data.total)
             setRecordsData(data.data)
             setFetching(false)
@@ -137,11 +134,11 @@ const Goods = () => {
                             <div className={`p-4 w-full flex items-center`}>
                                 <div className="w-full grid grid-cols-5 gap-6">
                                     <div className="flex flex-row items-center">
-                                        <label htmlFor="tradeName">专场名称:</label>
-                                        <Field id="tradeName" name='tradeName' type="text" className="form-input flex-1 ml-2" />
+                                        <label htmlFor="name" className='search-label'>名称:</label>
+                                        <Field id="name" name='name' type="text" className="form-input flex-1 ml-2" />
                                     </div>
                                     <div className="flex flex-row flex-grow items-center">
-                                        <label htmlFor="tradeStatus">创建日期:</label>
+                                        <label htmlFor="timeRange" className='search-label'>创建日期:</label>
                                         <DateInput 
                                         name='timeRange'
                                         range={true}
@@ -152,8 +149,8 @@ const Goods = () => {
                                         />
                                     </div>
                                     <div className="flex flex-row flex-grow items-center">
-                                        <label htmlFor="tradeStatus">状态:</label>
-                                        <Field as='select' id="tradeStatus" name='tradeStatus' className="form-select flex-1 ml-2">
+                                        <label htmlFor="status" className='search-label'>状态:</label>
+                                        <Field as='select' id="status" name='status' className="form-select flex-1 ml-2">
                                             <option value=''></option>
                                             {statusArr.map(item => {
                                                 return <option key={item.code} value={item.code}>{item.name}</option>

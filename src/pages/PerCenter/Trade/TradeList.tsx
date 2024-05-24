@@ -143,11 +143,11 @@ const Trade = () => {
                             <div className={`p-4 w-full flex items-center`}>
                                 <div className="w-full grid grid-cols-5 gap-6">
                                     <div className="flex flex-row items-center">
-                                        <label htmlFor="tradeName">专场名称:</label>
+                                        <label htmlFor="tradeName" className='search-label'>专场名称:</label>
                                         <Field id="tradeName" name='tradeName' type="text" className="form-input flex-1 ml-2" />
                                     </div>
                                     <div className="flex flex-row flex-grow items-center">
-                                        <label htmlFor="tradeStatus">开始日期:</label>
+                                        <label htmlFor="tradeStatus" className='search-label'>开始日期:</label>
                                         <DateInput 
                                         name='timeRange'
                                         range={true}
@@ -158,7 +158,7 @@ const Trade = () => {
                                         />
                                     </div>
                                     <div className="flex flex-row flex-grow items-center">
-                                        <label htmlFor="tradeStatus">专场状态:</label>
+                                        <label htmlFor="tradeStatus" className='search-label'>专场状态:</label>
                                         <Field as='select' id="tradeStatus" name='tradeStatus' className="form-select flex-1 ml-2">
                                             <option value=''></option>
                                             {statusArr.map(item => {
@@ -167,7 +167,7 @@ const Trade = () => {
                                         </Field>
                                     </div>
                                     <div className="flex flex-row flex-grow items-center">
-                                        <label htmlFor="sendStatus">发送引擎状态:</label>
+                                        <label htmlFor="sendStatus" className='search-label w-24'>发送引擎状态:</label>
                                         <Field as='select' id="sendStatus" name='sendStatus' className="form-select flex-1 ml-2">
                                             <option value=''></option>
                                             {sendStatusArr.map(item => {
