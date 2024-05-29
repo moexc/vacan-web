@@ -21,7 +21,7 @@ import {PersistGate} from 'redux-persist/integration/react'
 
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <React.StrictMode>
+    // <React.StrictMode>
         <Suspense>
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persist}>
@@ -29,5 +29,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 </PersistGate>
             </Provider>
         </Suspense>
-    </React.StrictMode>
+    // </React.StrictMode>
 );

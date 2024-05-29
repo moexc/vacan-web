@@ -10,7 +10,8 @@ const initTime = {days: 0, hours: 0, minutes: 0, seconds: 0}
 
 const TimeCountDown: FC<{
     overTime: number
-}> = ({overTime}) => {
+    className: string
+}> = ({overTime, className}) => {
 
     const [time, setTime] = useState<Time>(initTime)
 
@@ -30,7 +31,7 @@ const TimeCountDown: FC<{
         }
     },[overTime])
     return (
-        <div>
+        <div className={className}>
             {time.days > 0 && <span>{time.days}日</span>}
             {time.hours > 0 && <span>{time.hours}时</span>}
             {(time.hours > 0 || time.minutes > 0) && <span>{time.minutes}分</span>}

@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "../store";
 import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import sio, {Socket} from 'socket.io-client'
 import { parse } from "../util/time";
 import { toMoney } from "../util/number";
@@ -9,6 +9,11 @@ import TimeCountDown from "../components/TimeCountDown";
 import { flushTokenapi } from "../config/api/user";
 import { gotoLogin } from "../router/routes";
 import { flushToken, logout } from "../store/authStore";
+import { Field, Form, Formik } from "formik";
+import { DataTable } from "mantine-datatable";
+import { Cell, CellMoney } from "../components/DataTableCell";
+import IconArrowLeft from "../components/Icon/IconArrowLeft";
+import { toast } from "../components/Toast";
 
 type Trade = {
     id: string
@@ -40,80 +45,114 @@ const Bidding = () => {
     const authStore = useSelector((state: IRootState) => state.authStore);
     let token = authStore.token || ''
     const reftoken = authStore.reftoken || ''
-    const [socket, setSocket] = useState<Socket>()
     const [trade, setTrade] = useState<Trade>()
+    const socket = useRef<Socket>()
 
     useEffect(() => {
-        let socketIns = sio(`ws://localhost:9527?tradeId=${tradeId}&token=${token}`)
-        socketIns.on('TradeInfo', (msg)=>{
-            setTrade(msg)
-        })
-        socketIns.on('Bided', (msg) => {
-            console.log("Bided", msg);
-        })
-        socketIns.on('tokenTimeout', async () => {
-            let newtoken = '', newreftoken
-            await flushTokenapi(reftoken, (res: any)=>{
-                newtoken = res?.token
-                newreftoken = res?.refToken
-            })
-            if(!newtoken || !newreftoken){
-                dispatch(logout())
-                gotoLogin()
-                return;
-            }
-            dispatch(flushToken({'token': newtoken, 'reftoken': newreftoken}))
-            token = newtoken
-            socketIns = sio(`ws://localhost:9527?tradeId=${tradeId}&token=${token}`)
-        })
-
+        connectEngine()
+        
         return(() => {
-            socketIns.disconnect()
+            socket.current?.disconnect()
         })
     }, [])
+
+    const connectEngine = () => {
+        const socketIns = sio(`ws://localhost:9527?tradeId=${tradeId}&token=${token}`, {
+            reconnectionDelay: 1000,
+            timeout: 1000
+        })
+        socketIns.on('trade-info', (msg)=>{
+            setTrade(msg)
+        })
+        socketIns.on('bided', (msg: boolean) => {
+            msg ? toast('报价成功', 'success') : toast('报价失败', 'warning')
+        })
+        socketIns.on('token-exp', async (msg: string) => {
+            const token = await tokenExpFlush()            
+            socketIns.emit('reset-token', token)
+            if(msg === 'connect'){
+                console.log("connect", '重新connect');
+            }if(msg === 'bidding'){
+                console.log("bidding", '重新bidding');
+            }
+        })
+        socket.current = socketIns
+    }
+
+    const bidding = (price: number) => {
+        socket.current?.emit('bidding', {tradeId, 'bidId': trade?.bids[trade.bidIndex].id, price})
+    }
+
+    const tokenExpFlush = async () => {
+        let newtoken = '', newreftoken
+        await flushTokenapi(reftoken, (res: any)=>{
+            newtoken = res?.token
+            newreftoken = res?.refToken
+        })
+        if(!newtoken || !newreftoken){
+            dispatch(logout())
+            gotoLogin()
+            return;
+        }
+        dispatch(flushToken({'token': newtoken, 'reftoken': newreftoken}))
+        return newtoken
+    }
 
     const showBid = (bid: Bid) => {
         return (
             <>
                 <div className="w-full grid grid-cols-4 gap-2 text-lg">
                     <div className="col-start-1 col-end-6 flex">
-                        <div className="text-white-dark w-24">名称:</div>
-                        <div>{bid.name}</div>
+                        <div className="text-white-dark w-20 text-right">名称:</div>
+                        <div className="ml-2">{bid.name}</div>
                     </div>
+
                     <div className="flex">
-                        <div className="text-white-dark w-24">开始时间:</div>
-                        <div className="">{parse(bid.startTime)}</div>
+                        <div className="text-white-dark w-20 text-right">开始时间:</div>
+                        <div className="ml-2">{parse(bid.startTime)}</div>
                     </div>
                     <div className="col-start-2 col-end-6 flex">
-                        <div className="text-white-dark w-24">起拍价:</div>
-                        <div className="">{toMoney(bid.startPrice)}</div>
-                    </div>
-                    <div className="flex">
-                        <div className="text-white-dark w-24">竞拍状态:</div>
-                        <div className="">{statusBadge(bid.status)}</div>
-                    </div>
-                    <div className="col-start-2 col-end-6 flex">
-                        <div className="text-white-dark w-24">竞价幅度:</div>
-                        <div className="">{toMoney(bid.bidPrice)}</div>
-                    </div>
-                    <div className="flex">
-                        <div className="text-white-dark w-24">成交状态:</div>
-                        <div className="">{bidStatusBadge(bid.bidStatus)}</div>
-                    </div>
-                    <div className="col-start-2 col-end-6 flex">
-                        <div className="text-white-dark w-24">当前报价:</div>
-                        <div className="">{bid.price ? toMoney(bid.price) : '暂无'}</div>
-                    </div>
-                    <div className="flex">
-                        <div className="text-white-dark w-24">倒计时:</div>
-                        <div className="">
-                            <TimeCountDown overTime={bid.endTIme} />
+                        <div className="text-white-dark w-20 text-right">倒计时:</div>
+                        <div className="ml-2">
+                            <TimeCountDown overTime={bid.endTIme} className="text-red-500 font-bold" />
                         </div>
                     </div>
+
+                    <div className="flex">
+                        <div className="text-white-dark w-20 text-right">竞拍状态:</div>
+                        <div className="ml-2">{statusBadge(bid.status)}</div>
+                    </div>
                     <div className="col-start-2 col-end-6 flex">
-                        <div className="text-white-dark w-24">报价:</div>
-                        <div className="">
-                            <input/>
+                        <div className="text-white-dark w-20 text-right">起拍价:</div>
+                        <div className="ml-2">{toMoney(bid.startPrice)}</div>
+                    </div>
+                    
+                    <div className="flex">
+                        <div className="text-white-dark w-20 text-right">成交状态:</div>
+                        <div className="ml-2">{bidStatusBadge(bid.bidStatus)}</div>
+                    </div>
+                    <div className="col-start-2 col-end-6 flex">
+                        <div className="text-white-dark w-20 text-right">竞价幅度:</div>
+                        <div className="ml-2">{toMoney(bid.bidPrice)}</div>
+                    </div>
+                    
+                    <div className="flex">
+                        <div className="text-white-dark w-20 text-right">当前报价:</div>
+                        <div className="ml-2">{bid.price ? toMoney(bid.price) : '暂无'}</div>
+                    </div>
+                    
+                    <div className="col-start-2 col-end-6 flex">
+                        <div className="text-white-dark w-20 text-right">报价:</div>
+                        <div className="ml-2">
+                            <Formik
+                            initialValues={{price: ''}}
+                            onSubmit={(data) => bidding(Number(data.price))}
+                            >
+                                <Form className="flex gap-4">
+                                    <Field type="number" name='price' className="form-input w-28 p-1"/>
+                                    <button type="submit" className="btn btn-success w-full gap-2">提交</button>
+                                </Form>
+                            </Formik>
                         </div>
                     </div>
                 </div>
@@ -136,11 +175,11 @@ const Bidding = () => {
     return(
         <>
             {!trade ? (
-                <div className="px-60 pt-10 text-center text-xl">
+                <div className="px-60 pt-10 text-center text-xl" style={{minHeight: 'calc(100vh - 120px)'}}>
                     无数据
                 </div>
             ) : (
-                <div className="panel px-60 pt-10">
+                <div className="panel px-60 pt-10" style={{minHeight: 'calc(100vh - 120px)'}}>
                     <div className="flex justify-between flex-wrap gap-4 px-4">
                         <div className="text-2xl font-semibold uppercase flex items-center gap-2">
                             {trade.name}
@@ -153,63 +192,29 @@ const Bidding = () => {
                     <div className="flex justify-between lg:flex-row flex-col gap-6 flex-wrap min-h-[200px]">
                         {trade.bidIndex !== -1 ? showBid(trade.bids[trade.bidIndex]) : <div className="flex-1 pt-[50px] text-center text-lg text-warning font-semibold">未开始</div>}
                     </div>
-                    <div className="table-responsive mt-6">
-                        <table className="table-striped">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>名称</th>
-                                    <th>开始时间</th>
-                                    <th>结束时间</th>
-                                    <th>起拍价</th>
-                                    <th>成交价</th>
-                                    <th>竞拍状态</th>
-                                    <th>成交状态</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {trade.bids.map((item, index) => {
-                                    return (
-                                        <tr key={item.id}>
-                                            <td>{index + 1}</td>
-                                            <td>{item.name}</td>
-                                            <td>{parse(item.startTime)}</td>
-                                            <td>{item.status === '已结束' && parse(item.endTIme)}</td>
-                                            <td className="text-right">{toMoney(item.startPrice)}</td>
-                                            <td className="text-right">{toMoney(item.price)}</td>
-                                            <td>{item.status}</td>
-                                            <td>{item.bidStatus}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+
+                    <div className="datatables mt-6">
+                        <DataTable
+                        noRecordsText="无数据"
+                        records={trade.bids}
+                        columns={[
+                        { accessor: 'id', title: 'ID', hidden: true},
+                        { accessor: 'num', width: 60, title: '', textAlignment:'center', render: (item, index) => 
+                            <Cell align="right">{trade.bidIndex === index && <IconArrowLeft className="w-6 h-6" />}{index + 1}</Cell>
+                        },
+                        { accessor: 'name', title: '名称', textAlignment:'center', render: ({name}) => <Cell align="left">{name}</Cell>},
+                        { accessor: 'startTime', width: 200, title: '开始时间', textAlignment: 'center',  render: ({startTime}) => <Cell>{parse(startTime)}</Cell>},
+                        { accessor: 'endTIme', width:200, title: '结束时间', textAlignment: 'center', render: ({status, endTIme}) => <Cell>{status === '已结束' && parse(endTIme)}</Cell>},
+                        { accessor: 'startPrice', width:120, title: '起拍价', textAlignment: 'right', render: ({startPrice}) => <CellMoney>{startPrice}</CellMoney>},
+                        { accessor: 'price', width:120, title: '报价', textAlignment: 'right', render: ({price}) => <CellMoney>{price}</CellMoney>},
+                        { accessor: 'status', width: 180, title: '竞拍状态', textAlignment: 'center', render: ({status}) => <Cell>{status}</Cell>},
+                        { accessor: 'bidStatus', width:120, title: '成交状态', textAlignment: 'center', render: ({bidStatus}) => <Cell>{bidStatus}</Cell>},
+                        ]}
+                        idAccessor="id"
+                        minHeight={200}
+                        rowClassName={(item, index) => trade.bidIndex === index ? '!bg-gray-50' : ''}
+                        />
                     </div>
-                    {/* <div className="grid sm:grid-cols-2 grid-cols-1 px-4 mt-6">
-                        <div></div>
-                        <div className="ltr:text-right rtl:text-left space-y-2">
-                            <div className="flex items-center">
-                                <div className="flex-1">Subtotal</div>
-                                <div className="w-[37%]">$3255</div>
-                            </div>
-                            <div className="flex items-center">
-                                <div className="flex-1">Tax</div>
-                                <div className="w-[37%]">$700</div>
-                            </div>
-                            <div className="flex items-center">
-                                <div className="flex-1">Shipping Rate</div>
-                                <div className="w-[37%]">$0</div>
-                            </div>
-                            <div className="flex items-center">
-                                <div className="flex-1">Discount</div>
-                                <div className="w-[37%]">$10</div>
-                            </div>
-                            <div className="flex items-center font-semibold text-lg">
-                                <div className="flex-1">Grand Total</div>
-                                <div className="w-[37%]">$3945</div>
-                            </div>
-                        </div>
-                    </div> */}
                 </div>
             )}
         </>
