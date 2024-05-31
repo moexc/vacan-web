@@ -1,13 +1,23 @@
-import { Field, Form, Formik, useField } from "formik";
+import { Field, Form, Formik, FormikErrors, useField } from "formik";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from 'yup'
 import { Goods, createGoodsApi, getGoodsDetailApi, updateGoodsApi } from "../../../config/api/shop";
-import ImgUpload from "../../../components/ImgUpload";
 import Loading from "../../../components/Loading";
 import QuillEdit from "../../../components/QuillEdit/QuillEdit";
+import FileUpload, { Document } from "../../../components/FileUpload";
 
+type GoodsForm = {
+    title: string,
+    photo: Document[],
+    subdescr: string,
+    detail: string,
+    oldPrice: number,
+    price: number,
+    quantity: number,
+    classify: string,
+}
 
 const GoodsCompile = () => {
     const {t} = useTranslation()
@@ -16,9 +26,9 @@ const GoodsCompile = () => {
     const goodsId = location.state && location.state.goodsId
     const [loaded, setLoaded] = useState(false)
 
-    const [initialValues, setInitialValues] = useState<Goods>({
+    const [initialValues, setInitialValues] = useState<GoodsForm>({
         title: '',
-        photo: '',
+        photo: [],
         subdescr: '',
         detail: '',
         oldPrice: 0,
@@ -34,7 +44,12 @@ const GoodsCompile = () => {
     const loadInitData = () => {
         if(!goodsId) setLoaded(true)
         else getGoodsDetailApi(goodsId, (data: any) => {
-            setInitialValues(data)
+            setInitialValues({...data, photo: [{
+                id: new Date().getTime(),
+                name: data.photo.split('/').pop(),
+                url: data.photo,
+                status: 'done'
+            }]})
             setLoaded(true)
         })
     }
@@ -45,7 +60,11 @@ const GoodsCompile = () => {
 
     const checkSchema = Yup.object().shape({
         title: Yup.string().required(required),
-        photo: Yup.string().required(required),
+        photo: Yup.array().of(
+            Yup.object().shape({
+                url: Yup.string().nullable().required(required),
+            })
+        ).min(1, required),
         subdescr: Yup.string().required(required),
         detail: Yup.string().required(required),
         oldPrice: Yup.number().nullable().required(required).integer(integer).min(1, `${min}1`),
@@ -58,8 +77,9 @@ const GoodsCompile = () => {
         navigate('/goods')
     }
 
-    const saveGoods = (data: Goods) => {
-        goodsId ? updateGoodsApi(data, goodsId, gotoGoodsListPage) : createGoodsApi(data, gotoGoodsListPage)
+    const saveGoods = (data: GoodsForm) => {
+        const goods: Goods = {...data, photo: data.photo[0].url || ''}
+        goodsId ? updateGoodsApi(goods, goodsId, gotoGoodsListPage) : createGoodsApi(goods, gotoGoodsListPage)
     }
 
     return (
@@ -69,7 +89,8 @@ const GoodsCompile = () => {
         initialValues={initialValues}
         validationSchema={checkSchema}
         onSubmit={saveGoods}
-        >
+        handleChange={(e: any) => console.log("handleChange", e)}
+        > 
 
         {({ values, errors, submitCount, touched }) => (
             <Form>
@@ -79,8 +100,26 @@ const GoodsCompile = () => {
                             <label htmlFor="photo" className="mr-2 w-20 text-right">
                                 图片
                             </label>
-                            <ImgUpload name="photo" maxFileSize={1024*1024} maxFileCount={1} width="w-[250px]"/>
-                            {errors.photo ? <div className="text-danger mt-1">{errors.photo}</div> : null}
+                            <Field name="photo">
+                            {({field, form: { touched, errors, setValues, setFieldValue }, meta }: any) => (
+                                <FileUpload
+                                name={field.name}
+                                values={meta.value}
+                                type="img"
+                                width="w-[250px]"
+                                maxFileCount={1}
+                                maxFileSize={1024 * 1024}
+                                acceptType={['jpg', 'png', 'jpeg']}
+                                onChange={docs => setFieldValue(field.name, docs)}
+                                />
+                            )}
+                            </Field>
+                            {errors.photo ? 
+                            <div className="text-danger mt-1">
+                                {errors.photo instanceof Array ? (errors.photo as FormikErrors<Document>[])[0].url 
+                                : errors.photo }
+                            </div> 
+                            : null}
                         </div>
                         <div className="col-span-3 flex items-center">
                             <label htmlFor="title" className="mr-2 w-20 text-right">
@@ -128,7 +167,14 @@ const GoodsCompile = () => {
                             <label htmlFor="detail" className="mr-2 w-20 text-right">
                                 详情
                             </label>
-                            <QuillEdit>{initialValues.detail}</QuillEdit>
+                            <Field name="detail">
+                            {({field, form: { touched, errors, setValues, setFieldValue }, meta }: any) => (
+                                <QuillEdit
+                                onChange={docs => setFieldValue(field.name, docs)}
+                                />
+                            )}
+                            </Field>
+                            {/* <QuillEdit>{initialValues.detail}</QuillEdit> */}
                             {touched.detail && errors.detail ? <div className="text-danger mt-1">{errors.detail}</div> : null}
                         </div>
                         <div className="col-span-4 flex">

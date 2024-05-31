@@ -1,11 +1,13 @@
 
 import Quill from "quill"
 import 'quill/dist/quill.snow.css'
-import { PropsWithChildren, useEffect, useRef } from "react"
+import { FC, PropsWithChildren, useEffect, useRef } from "react"
 import './QuillEdit.css'
 
 let quill
-const QuillEdit = ({children}: PropsWithChildren) => {
+const QuillEdit: FC<{
+    onChange: (data: string) => {}
+}> = ({onChange}) => {
 
     const flag = useRef<boolean>(true)
 
@@ -108,7 +110,7 @@ const QuillEdit = ({children}: PropsWithChildren) => {
 
     return (
         <div>
-            <div id="quill-plane">{children}</div>
+            <div id="quill-plane"></div>
         </div>
     )
     

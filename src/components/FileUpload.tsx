@@ -8,7 +8,7 @@ import { RefreshIconBtn, XCircleIconBtn } from "./IconBtn"
 const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) => {
     const {
         name, 
-        values = [], 
+        values = [],
         acceptType,
         useDefaultView = true, 
         type = 'file', 
@@ -23,7 +23,6 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
     const fileInput = document.getElementById(name)
     const currentChangeIdRef = useRef(-1)
     const [accept, setAccept] = useState('')
-    const [docs, setDocs] = useState<Document[]>([])
     const selectedId = useRef(new Set<number>())
     const uploadingId = useRef(new Set<number>())
 
@@ -33,18 +32,14 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
                 return typeDefine.get(v)
             }).join(',') || ''
         )
-        setDocs(values.map(v => {
-            return {id: new Date().getTime() + Math.random(), url: v, name: (v.split('/').pop()) || '', status: 'done'}
-        }))
     }, [])
 
     useEffect(() => {
-        onChange(docs)
         filesListen()
-    }, [docs])
+    }, [values])
 
     const filesListen = () => {
-        docs.forEach(doc => {
+        values.forEach(doc => {
             if(doc.status === 'selected' && !selectedId.current.has(doc.id)) selectedExec(doc)
             if(doc.status === 'uploading' && !uploadingId.current.has(doc.id)) uploadingExec(doc)
         })
@@ -89,13 +84,19 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
         modfiyFiles({...doc, status: 'done', url})
     }
 
-    const modfiyFiles = (doc: Document) => {
-        setDocs(docs => 
-            docs.map(item => {
+    const modfiyFiles = (doc: Document, oper: 'add' | 'update' | 'delete' = 'update') => {
+        let newDocs: Document[] = []
+        if(oper === 'add'){
+            newDocs = [...values, doc]
+        }else if(oper === 'update'){
+            newDocs = values.map(item => {
                 if(item.id === doc.id) return doc
                 else return item
             })
-        )
+        }else if(oper === 'delete'){
+            newDocs = values.filter(item => item.id != doc.id)
+        }
+        onChange(newDocs)
     }
 
     const addFile = (file: File) => {
@@ -103,25 +104,22 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
         currentChangeIdRef.current = -1
 
         if(currentChangeId === -1) {
-            setDocs(docs => [...docs, {id: new Date().getTime(), file, name: file.name, status: 'selected', message: ''}])
+            modfiyFiles({id: new Date().getTime(), file, name: file.name, status: 'selected', url: '', message: ''}, 'add')
         } else {
             selectedId.current.delete(currentChangeId)
             uploadingId.current.delete(currentChangeId)
-            modfiyFiles({id: currentChangeId, file, name: file.name, status: 'selected', message: ''})
+            modfiyFiles({id: currentChangeId, file, name: file.name, status: 'selected', url: '', message: ''})
         }
     }
 
     const reupload = (index: number) => {
-        const currentDoc = docs[index]
+        const currentDoc = values[index]
         uploadingId.current.delete(currentDoc.id)
         modfiyFiles({...currentDoc, status: 'uploading'})
     }
 
     const delFile = (index: number) => {
-        setDocs(docs => {
-            docs.splice(index, 1)
-            return [...docs]
-        })
+        modfiyFiles(values[index], 'delete')
     }
 
     const updateFile = (id: number) => {
@@ -132,7 +130,7 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
     return (
         useDefaultView ? 
         <div className={`grid ${isImg ? 'grid-cols-4' : 'grid-cols-1'} ${width}`}>
-            {docs.map((doc, index) => {
+            {values.map((doc, index) => {
                 return (
                     <div key={`${name}_${index}`} className={`${!isImg ? 'mb-2 border-blue-100 border-b-2 hover:bg-gray-200' : ''}`}>
                         <div onClick={() => {updateFile(doc.id)}} 
@@ -170,7 +168,7 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
                     </div>
                 )
             })}
-            {docs.length < maxFileCount && 
+            {values.length < maxFileCount && 
                 <div onClick={() => updateFile(-1)} 
                 className={`flex items-center justify-center border-gray-200 border-2 border-dashed rounded-xl ${isImg && imgView}`}
                 >
@@ -187,7 +185,7 @@ const FileUpload: FC<FileUploadOption> = (fileUploadOption: FileUploadOption) =>
 export type FileUploadOption = {
     name: string,
     acceptType?: string[]
-    values?: string[]
+    values?: Document[]
     useDefaultView?: boolean
     type?: 'img' | 'file'
     width?: string
@@ -201,7 +199,7 @@ export type Document = {
     id: number
     file?: File
     name: string
-    url?: string
+    url: string
     status: 'selected' | 'uploading' | 'done' | 'error'
     message?: string
 }
