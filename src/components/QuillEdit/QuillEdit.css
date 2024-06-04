@@ -2,6 +2,13 @@
     min-height: 200px;
 }
 
+.ql-snow .ql-editor img {
+	margin: 0;
+	height: auto;
+	width: auto;
+    display: inline;
+}
+
 .ql-snow .ql-tooltip[data-mode='link']::before {
     content: '请输入链接地址:' !important;
 }

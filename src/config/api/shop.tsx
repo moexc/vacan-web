@@ -52,7 +52,7 @@ export const updateGoodsApi = (data: Goods, id: string, fetched: Function) => re
 })
 
 /**
- * 获取商品详情
+ * 获取商品详情 - 更新商品信息页
  * @param id 商品ID
  * @param fetched callback
  * @returns 

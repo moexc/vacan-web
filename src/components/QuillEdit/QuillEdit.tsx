@@ -1,15 +1,20 @@
 
 import Quill from "quill"
 import 'quill/dist/quill.snow.css'
-import { FC, PropsWithChildren, useEffect, useRef } from "react"
+import { FC, useEffect, useRef } from "react"
 import './QuillEdit.css'
+import { fileUploadApi } from "../../config/api/file"
+import { toast } from "../Toast"
 
-let quill
+let quill: Quill
 const QuillEdit: FC<{
+    value?: string
     onChange: (data: string) => {}
-}> = ({onChange}) => {
+}> = ({value = '', onChange}) => {
 
     const flag = useRef<boolean>(true)
+    const quillRef = useRef<HTMLDivElement>(null)
+    const uploadImgRef = useRef<HTMLInputElement>(null)
 
     //富文本modules配置
     const toolbarOptions = [
@@ -66,7 +71,7 @@ const QuillEdit: FC<{
         ['ql-video','视频'],
     ])
         
-    function addQuillTitle(){
+    function changeQuillTitle(){
         const oToolBar = document.querySelector('.ql-toolbar'), 
             aButton = oToolBar?.querySelectorAll('button'),
             aSpan = oToolBar?.querySelectorAll('span .ql-picker') || []
@@ -103,14 +108,70 @@ const QuillEdit: FC<{
         if (flag.current) {
             flag.current = false
             quill = new Quill('#quill-plane', options)
-            addQuillTitle()
+            changeQuillTitle()
+            quill.clipboard.dangerouslyPasteHTML(value)
+
+            //上传图片
+            const toolbar: any = quill.getModule('toolbar')
+            toolbar.addHandler('image', uploadImgHandler);
+            
+            //粘贴图片
+            quill.root.addEventListener('paste', (e) => {
+                if (
+                    e.clipboardData &&
+                    e.clipboardData.files &&
+                    e.clipboardData.files.length
+                ) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.cancelBubble = true;
+                    [].forEach.call(e.clipboardData.files, async (file: File) => {
+                        if (!file.type.match(/^image\/(gif|jpe?g|a?png|bmp)/i)) {
+                            return;
+                        }
+                        await uploadImg(file)
+                    });
+                }
+            }, true)
+
+            //失去焦点 useCallback(onChange())
+            quill.root.querySelector('.ql-editor')?.addEventListener('blur', () => {
+                onChange(quill.getSemanticHTML())
+            })
+
             return
         }
     },[])
 
+    const uploadImgHandler = () => {
+        uploadImgRef.current?.click()
+    }
+
+    const uploadImg = async (img: File) => {
+        let res
+        await fileUploadApi(img, (resData) => res = resData)
+
+        if(!res) {
+            toast('上传失败', 'danger')
+            return
+        }
+        const {code, data: url, msg} = res
+        if(code != 0){
+            toast(msg, 'danger')
+            return
+        }
+        const addImageRange = quill.getSelection()
+        const newRange = 0 + (addImageRange !== null ? addImageRange.index : 0)
+        quill.insertEmbed(newRange, 'image', url)
+        quill.setSelection(1 + newRange)
+    }
+
     return (
         <div>
-            <div id="quill-plane"></div>
+            <div id="quill-plane" ref={quillRef}>
+            </div>
+            <input ref={uploadImgRef} onChange={(e: any) => uploadImg(e.target.files[0])} 
+            type="file" className="hidden" accept="image/png, image/jpeg, image/gif"/>
         </div>
     )
     

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react"
 import { guessLikesapi } from '../../config/api/shop';
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const Suggest = () => {
     const {t} = useTranslation()
+    const navigate = useNavigate()
     const [guessLikes, setGuessLikes] = useState([])
 
     useEffect(()=>{
@@ -14,12 +16,16 @@ const Suggest = () => {
         guessLikesapi(setGuessLikes)
     }
 
+    const gotoGoodsDetailPage = (id: string) => {
+        navigate(`/goods_detail/${id}`)
+    }
+
     return (
         <div>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-5">
                 {guessLikes.map((item: any) => {
                     return (
-                        <div key={item.id} className={`space-y-5 rounded-md border border-white-light bg-white p-5 shadow-[0px_0px_2px_0px_rgba(145,158,171,0.20),0px_12px_24px_-4px_rgba(145,158,171,0.12)] dark:border-[#1B2E4B] dark:bg-black`}>
+                        <div key={item.id} onClick={() => gotoGoodsDetailPage(item.id)} className={`space-y-5 rounded-md border border-white-light bg-white p-5 shadow-[0px_0px_2px_0px_rgba(145,158,171,0.20),0px_12px_24px_-4px_rgba(145,158,171,0.12)] dark:border-[#1B2E4B] dark:bg-black`}>
                             <div className="h-56 overflow-hidden rounded-md">
                                 <img src={item.photo} alt="..." className="w-full object-cover" />
                             </div>

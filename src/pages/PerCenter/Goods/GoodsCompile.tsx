@@ -1,4 +1,4 @@
-import { Field, Form, Formik, FormikErrors, useField } from "formik";
+import { Field, Form, Formik, FormikErrors } from "formik";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -101,7 +101,7 @@ const GoodsCompile = () => {
                                 图片
                             </label>
                             <Field name="photo">
-                            {({field, form: { touched, errors, setValues, setFieldValue }, meta }: any) => (
+                            {({field, form: { touched, errors, setFieldValue }, meta }: any) => (
                                 <FileUpload
                                 name={field.name}
                                 values={meta.value}
@@ -168,25 +168,23 @@ const GoodsCompile = () => {
                                 详情
                             </label>
                             <Field name="detail">
-                            {({field, form: { touched, errors, setValues, setFieldValue }, meta }: any) => (
+                            {({field, form: { touched, errors, setFieldValue }, meta }: any) => (
                                 <QuillEdit
+                                value={meta.value}
                                 onChange={docs => setFieldValue(field.name, docs)}
                                 />
                             )}
                             </Field>
-                            {/* <QuillEdit>{initialValues.detail}</QuillEdit> */}
                             {touched.detail && errors.detail ? <div className="text-danger mt-1">{errors.detail}</div> : null}
                         </div>
                         <div className="col-span-4 flex">
-                            <label htmlFor="detail" className="mr-2 w-20 text-right">
-                                
-                            </label>
+                            <label className="mr-2 w-20 text-right"></label>
                             <div className="mt-10 flex items-center justify-center gap-10">
                                 <button type="submit" className="btn btn-success">
                                     {t('save')}
                                 </button>
                                 <button className="btn btn-warning" onClick={(e) => {
-                                        e.stopPropagation
+                                        e.stopPropagation()
                                         gotoGoodsListPage()
                                     }}>
                                     {t('cancel')}
