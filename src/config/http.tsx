@@ -88,6 +88,9 @@ http.interceptors.response.use(
             case 404:
                 toast('服务器离家出走了 ⊙﹏⊙∥', 'danger')
                 break;
+            case 409:
+                toast('请稍后重试', 'warning')
+                break;
             case 500:
                 toast('服务器出现了点小问题 ⊙﹏⊙∥', 'danger')
                 break;

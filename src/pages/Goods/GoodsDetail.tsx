@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { useEffect, useRef, useState } from "react"
+import { useNavigate, useParams } from "react-router-dom"
 import Loading from "../../components/Loading"
 import { Field, Form, Formik } from "formik"
+import { getGoodsDetailApi } from "../../config/api/shop"
+import { createOrderApi } from "../../config/api/order"
+import AddressSelect from "../../components/AddressSelect"
 
 type Detail = {
-    id: string
     title: string
     photo: string
     subdescr: string
@@ -12,48 +14,55 @@ type Detail = {
     oldPrice: number
     price: number
     quantity: number
-    classifyName: string
 }
 
 const GoodsDetail = () => {
-    const location = useLocation()
-    const {id} = useParams()
+    const nav = useNavigate()
+    const {id = ''} = useParams()
+    const [loading, setLoading] = useState(true)
     const [goods, setGoods] = useState<Detail>()
+    const [addressDialogShow, setAddressDialogShow] = useState(false)
+    const payCount = useRef(1)
 
     useEffect(() => {
         loadInitData()
     }, [])
 
     const loadInitData = () => {
-        setGoods({
-            'id': 'goods001',
-            title: '玄黄不灭甲',
-            photo: 'http://172.18.0.5:9000/vacan/1715047588395_wechat-tools-icon.png',
-            subdescr: '简介修改后',
-            detail: '<p>afjalf</p><p>afaf</p><p><img src="http://172.18.0.5:9000/vacan/1717386609894_wechat-tools-icon.png"></p><p>afdafa</p>',
-            oldPrice: 100,
-            price: 99.99,
-            quantity: 38,
-            classifyName: '衣服'
+        getGoodsDetailApi(id, (data: any) => {
+            setGoods(data)
+            setLoading(false)
+        })
+    }
+
+    const selectAddress = (count: number) => {
+        payCount.current = count
+        setAddressDialogShow(true)
+    }
+
+    const createOrder = (address: string) => {
+        createOrderApi(id, payCount.current, address, (orderId: string) => {
+            if(!orderId) return
+            nav(`/pay/${orderId}`)
         })
     }
 
     return(
         <>
-        {!goods ? <Loading/> :
+        {loading || !goods ? <Loading/> :
         <div className="panel px-60 pt-10" style={{minHeight: 'calc(100vh - 120px)'}}>
-            <div className="h-[400px] grid grid-cols-3 gap-6">
-                <div className="h-[100%] text-center items-center">
+            <div className="grid grid-cols-3 gap-6">
+                <div className="h-[400px] text-center items-center">
                     <img src={goods.photo} alt="img" className="h-[100%] border border-[#d3d3d3]" />
                 </div>
-                <div className="h-[100%] col-start-2 col-end-4">
+                <div className="col-start-2 col-end-4">
                 <Formik
                 initialValues={{count: 1}}
-                onSubmit={() => {}}
+                onSubmit={(data) => selectAddress(data.count)}
                 >
                 <Form>
                     <ul className="space-y-5 font-semibold text-white-dark">
-                        <li className="text-3xl">
+                        <li className="text-2xl">
                             {goods.title}
                         </li>
                         <li className="min-h-[150px]">
@@ -73,6 +82,9 @@ const GoodsDetail = () => {
                         </li>
                         <li>
                             <button type="submit" className="btn btn-success">下单</button>
+                        </li>
+                        <li>
+                            <AddressSelect show={addressDialogShow} close={() => setAddressDialogShow(false)} onChange={(data) => {createOrder(data)}} />
                         </li>
                     </ul>
                 </Form>
