@@ -10,12 +10,15 @@ import IconPush from './Icon/IconPush';
 import IconCaretDown from './Icon/IconCaretDown';
 import IconXCircle from './Icon/IconXCircle';
 import IconRefresh from './Icon/IconRefresh';
+import IconCircleCheck from './Icon/IconCircleCheck';
+import IconDollarSignCircle from './Icon/IconDollarSignCircle';
+import IconChatDot from './Icon/IconChatDot';
 
 
 
-const IconBtn = ({children, title, className, onClick}: PropsWithChildren<IconBtnProp>) => {
+const IconBtn = ({children, title, tip, className, onClick}: PropsWithChildren<IconBtnProp>) => {
     return (
-        <Tippy content={title}>
+        <Tippy content={tip || title}>
             <button type="button" className={className} onClick={(e) => {e.stopPropagation(); onClick()}}>
                 {children}
             </button>
@@ -25,27 +28,27 @@ const IconBtn = ({children, title, className, onClick}: PropsWithChildren<IconBt
 
 const EditIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
     const {t} =  useTranslation()
-    return <IconBtn {...prop} title={t('edit')}> <IconPencil/> </IconBtn>
+    return <IconBtn {...prop} title={t('edit')}><IconPencil/></IconBtn>
 }
 
 const DeleteIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
     const {t} =  useTranslation()
-    return <IconBtn {...prop} title={t('delete')}> <IconTrashLines/> </IconBtn>
+    return <IconBtn {...prop} title={t('delete')}><IconTrashLines/></IconBtn>
 }
 
 const ShelveIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
     const {t} =  useTranslation()
-    return <IconBtn {...prop} title={t('shelve')}> <IconShelve/> </IconBtn>
+    return <IconBtn {...prop} title={t('shelve')}><IconShelve/></IconBtn>
 }
 
 const OffShelfIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
     const {t} =  useTranslation()
-    return <IconBtn {...prop} title={t('off_shelf')}> <IconOffShelf/> </IconBtn>
+    return <IconBtn {...prop} title={t('off_shelf')}><IconOffShelf/> </IconBtn>
 }
 
 const PushIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
     const {t} =  useTranslation()
-    return <IconBtn {...prop} title={t('push')}> <IconPush/> </IconBtn>
+    return <IconBtn {...prop} title={t('push')}><IconPush className='w-6 h-6 ml-[-2px]'/></IconBtn>
 }
 
 const ExpandIconBtn = (prop: OperSwitchProp) => {
@@ -61,12 +64,24 @@ const ExpandIconBtn = (prop: OperSwitchProp) => {
 
 const XCircleIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
     const {t} =  useTranslation()
-    return <IconBtn {...prop} title={t('delete')}> <IconXCircle/> </IconBtn>
+    return <IconBtn {...prop} title={t('delete')}><IconXCircle/></IconBtn>
 }
 
 const RefreshIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
     const {t} =  useTranslation()
-    return <IconBtn {...prop} title={t('refresh')}> <IconRefresh/> </IconBtn>
+    return <IconBtn {...prop} title={t('refresh')}><IconRefresh/></IconBtn>
+}
+
+const ConfirmIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
+    return <IconBtn {...prop} title='确定'><IconCircleCheck className='w-5 h-5'/></IconBtn>
+}
+
+const DollarIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
+    return <IconBtn {...prop} title='付款'><IconDollarSignCircle/></IconBtn>
+}
+
+const ChatDotIconBtn = (prop: PropsWithChildren<OperIconProp>) => {
+    return <IconBtn {...prop} title='聊天'><IconChatDot/></IconBtn>
 }
 
 type OperSwitchProp = {
@@ -77,6 +92,7 @@ type OperSwitchProp = {
 type OperIconProp = {
     onClick: () => void
     className?: string
+    tip?: string
 }
 
 type IconBtnProp = {
@@ -84,6 +100,7 @@ type IconBtnProp = {
     title: string
     onClick: () => void
     className?: string
+    tip?: string
 }
 
-export{EditIconBtn, DeleteIconBtn, ShelveIconBtn, OffShelfIconBtn, PushIconBtn, ExpandIconBtn, XCircleIconBtn, RefreshIconBtn}
+export{EditIconBtn, DeleteIconBtn, ShelveIconBtn, OffShelfIconBtn, PushIconBtn, ExpandIconBtn, XCircleIconBtn, RefreshIconBtn, ConfirmIconBtn, DollarIconBtn, ChatDotIconBtn}

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { OrderVO, getOrderDetailApi, getPayQrcodeApi } from "../../config/api/order"
+import { useNavigate, useParams } from "react-router-dom"
+import { OrderVO, getOrderDetailApi, getPayOrderResultApi, getPayQrcodeApi } from "../../config/api/order"
 import Loading from "../../components/Loading"
 import { toMoney } from "../../util/number"
 import { parse } from "../../util/time"
 import TimeCountDown from "../../components/TimeCountDown"
 
 const Pay = () => {
+    const nav = useNavigate()
     const {orderId = ''} = useParams()
     const [order, setOrder] = useState<OrderVO>()
     const [loading, setLoading] = useState(true)
@@ -14,6 +15,14 @@ const Pay = () => {
 
     useEffect(() => {
         initData()
+        const itv = setInterval(async () => {
+            let payed
+            await getPayOrderResultApi(orderId, (data) => payed = data)
+            payed === '1' && nav(`/pay/result/${orderId}`)
+        }, 3000)
+        return () => {
+            clearInterval(itv)
+        }
     }, [])
 
     const initData = async () => {
@@ -30,7 +39,7 @@ const Pay = () => {
         <>
         {loading || !order ? <Loading/> :
         <div className="panel px-60 pt-10" style={{minHeight: 'calc(100vh - 120px)'}}>
-            {order.status == '00'? <div className="text-center mt-20 text-3xl">此订单不可支付</div>:
+            {order.status != '00'? <div className="text-center mt-20 text-3xl">此订单不可支付</div>:
             <div>
                 <div className="panel">
                     <div className="flex justify-between flex-wrap gap-4 px-4">
@@ -38,11 +47,11 @@ const Pay = () => {
                         
                     </div>
                     <div className="flex justify-between flex-wrap gap-4 px-4">
-                        
+
                         <div className="space-y-1 text-white-dark pt-16">
                             <div>收货地址：{order.address}</div>
                             <div>下单时间：{parse(order.createTime)}</div>
-                            <div>自动取消：<TimeCountDown overTime={order.createTime + (100000 * 60 * 1000)} className="text-red-500 font-bold inline" /></div>
+                            <div>自动取消：<TimeCountDown overTime={order.createTime + (10 * 60 * 1000)} down={initData} className="text-red-500 font-bold inline" /></div>
                         </div>
                         <div className="flex-1 flex gap-3">
                             <div className="w-[125px] text-center">

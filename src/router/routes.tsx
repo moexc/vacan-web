@@ -17,8 +17,12 @@ const TradeList = lazy(() => import('../pages/PerCenter/Trade/TradeList'));
 const TradeCompile = lazy(() => import('../pages/PerCenter/Trade/TradeCompile'));
 const GoodsList = lazy(() => import('../pages/PerCenter/Goods/GoodsList'))
 const GoodsCompile = lazy(() => import('../pages/PerCenter/Goods/GoodsCompile'))
+const OrderList = lazy(() => import('../pages/PerCenter/Order/OrderList'))
+
+
 const GoodsDetail = lazy(() => import('../pages/Goods/GoodsDetail'))
 const Pay = lazy(() => import('../pages/Order/Pay'))
+const PayResult = lazy(() => import('../pages/Order/PayResult'))
 
 const RecoverIdBoxed = lazy(() => import('../pages/Authentication/RecoverIdBox'));
 
@@ -41,6 +45,7 @@ const routes = [
     },
     {path: '/goods_detail/:id', element: <GoodsDetail/>, layout: 'blank'},
     {path: '/pay/:orderId', element: <Pay/>, layout: 'blank'},
+    {path: '/pay/result/:orderId', element: <PayResult/>, layout: 'blank'},
     {path: '/bid', element: <Bidding />, layout: 'blank'},
     // 个人中心
     {path: '/home', element: <Home />},
@@ -50,6 +55,7 @@ const routes = [
     {path: '/goods', element: <GoodsList />},
     {path: '/goods/add', element: <GoodsCompile />},
     {path: '/goods/edit', element: <GoodsCompile />},
+    {path: '/order', element: <OrderList/>},
     
     // 登录、注册
     {path: '/auth/login',element: <Login />,layout: 'blank',auth: false, header: false},

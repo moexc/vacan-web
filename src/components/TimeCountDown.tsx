@@ -11,7 +11,8 @@ const initTime = {days: 0, hours: 0, minutes: 0, seconds: 0}
 const TimeCountDown: FC<{
     overTime: number
     className: string
-}> = ({overTime, className}) => {
+    down?: () => void
+}> = ({overTime, className, down}) => {
 
     const [time, setTime] = useState<Time>(initTime)
 
@@ -19,6 +20,10 @@ const TimeCountDown: FC<{
         const interval = setInterval(() => {
             const now = new Date().getTime()
             const distance = overTime - now
+            if(distance <= 0){
+                clearInterval(interval)
+                down && down()
+            }
             const newVal: Time = initTime
             newVal.days = Math.floor(distance / (1000 * 60 * 60 * 24));
             newVal.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

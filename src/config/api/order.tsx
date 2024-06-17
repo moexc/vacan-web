@@ -20,6 +20,13 @@ export type OrderVO = {
     deleteTime?: number
 }
 
+export type SearchCondit = {
+    title: string
+    status: string
+    createTimeRangeBefore: string
+    createTimeRangeAfter: string
+}
+
 /**
  * 创建订单
  * @param shopId 商品ID
@@ -52,17 +59,63 @@ export const getPayQrcodeApi = (orderId: string, fetched: Function) => request({
     url: `/api/pay/${orderId}`, params:{mode: 'alipay_qrcode'}, fetched
 })
 
-export const searchOrdersApi = (searchCondit: string, page: number, rows: number) => request({
-    url: '/api/order/search', method: 'post', data: searchCondit, params:{page, rows}
+/**
+ * 获取支付状态
+ * @param orderId 订单ID
+ * @returns callback
+ */
+export const getPayOrderResultApi = (orderId: string, fetchedata: (data: any) => void) => request({
+    url: `/api/pay/result/${orderId}`, fetchedata
 })
 
-export const cancelOrderApi = (orderId: string) => request({url: `/api/order/${orderId}/cancel`, method: 'put'})
-export const deliverOrderApi = (orderId: string) => request({url: `/api/order/${orderId}/deliver`, method: 'put'})
-export const acceptOrderApi = (orderId: string) => request({url: `/api/order/${orderId}/accept`, method: 'put'})
+/**
+ * 我的订单列表
+ * @param searchCondit 查询条件
+ * @param page 页
+ * @param rows 行
+ * @param fetched callback
+ * @returns 
+ */
+export const getOrderListApi = (searchCondit: SearchCondit, page: number, rows: number, fetched: Function) => request({
+    url: '/api/order/search', method: 'post', data: searchCondit, params:{page, rows}, fetched
+})
 
-export const deleteOrderApi = (orderId: string) => request({url: `/api/order/${orderId}`, method: 'delete'})
+/**
+ * 取消订单
+ * @param orderId 订单ID
+ * @param fetched callback
+ * @returns 
+ */
+export const cancelOrderApi = (orderId: string, fetched: Function) => request({
+    url: `/api/order/${orderId}/cancel`, method: 'put', fetched
+})
 
+/**
+ * 发货
+ * @param orderId 订单ID
+ * @param fetched callback
+ * @returns 
+ */
+export const deliverOrderApi = (orderId: string, fetched: Function) => request({
+    url: `/api/order/${orderId}/deliver`, method: 'put', fetched
+})
 
-export const getPayOrderResultApi = (orderId: string) => request({url: `/api/pay/result/${orderId}`})
+/**
+ * 收货
+ * @param orderId 订单ID
+ * @param fetched callback
+ * @returns 
+ */
+export const acceptOrderApi = (orderId: string, fetched: Function) => request({
+    url: `/api/order/${orderId}/accept`, method: 'put', fetched
+})
 
-
+/**
+ * 删除订单
+ * @param orderId 订单ID
+ * @param fetched callback
+ * @returns 
+ */
+export const deleteOrderApi = (orderId: string, fetched: Function) => request({
+    url: `/api/order/${orderId}`, method: 'delete', fetched
+})
